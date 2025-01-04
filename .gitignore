@@ -26,3 +26,5 @@ vite.config.ts.timestamp-*
 *.db
 
 *storybook.log
+
+src/lib/test_files
