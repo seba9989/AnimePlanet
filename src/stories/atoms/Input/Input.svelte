@@ -1,11 +1,16 @@
 <script lang="ts">
+	import { cn } from '$lib/utils/cn';
 	import { Eye, EyeClosed, Search } from 'lucide-svelte';
-	import type { SvelteHTMLElements } from 'svelte/elements';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	let props: SvelteHTMLElements['input'] = $props();
+	interface Props extends HTMLInputAttributes {
+		wrapperClass?: string;
+	}
+
+	let props: Props = $props();
 
 	let type = $state(props.type);
-	const realType = props.type;
+	const { type: realType, wrapperClass } = props;
 
 	const showPassword = () => {
 		if (type == 'password') {
@@ -17,9 +22,9 @@
 </script>
 
 {#if realType == 'password'}
-	<div class="input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800">
+	<div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', wrapperClass)}>
 		<input {...props} {type} />
-		<button class="input-group-cell preset-tonal-surface" onclick={showPassword}>
+		<button type="button" class="input-group-cell preset-tonal-surface" onclick={showPassword}>
 			{#if type == 'password'}
 				<EyeClosed size="20" />
 			{:else}
@@ -28,13 +33,10 @@
 		</button>
 	</div>
 {:else if realType == 'search'}
-	{@const { onclick, ...inputProps } = props}
-	<div class="input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800">
-		<input {...inputProps} {type} />
+	<div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', wrapperClass)}>
+		<input {...props} {type} />
 
-		<button
-			class="input-group-cell preset-tonal-surface"
-		>
+		<button class="input-group-cell preset-tonal-surface">
 			<Search size="20" />
 		</button>
 	</div>

@@ -1,1 +1,3 @@
-<h1 class="h3">Anime Planet</h1>
+<h1 class="h3 text-nowrap">
+	<a href="/"> Anime Planet </a>
+</h1>
