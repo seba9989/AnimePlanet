@@ -1,29 +1,45 @@
-import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
-import { createId } from '@paralleldrive/cuid2';
+import {
+	mysqlTable,
+	text,
+	int,
+	primaryKey,
+	timestamp,
+	boolean,
+	varchar
+} from 'drizzle-orm/mysql-core';
+import { init } from '@paralleldrive/cuid2';
 import { relations } from 'drizzle-orm';
 
+const createId = init({
+	length: 255
+});
+
+const id = (name: string) => varchar(name, { length: 255 }).unique();
+
 const uuid = (name: string) =>
-	text(name)
+	id(name)
 		.$defaultFn(() => createId())
 		.unique();
 
-export const user = sqliteTable('user', {
+const uniqueText = (name: string) => varchar(name, { length: 255 }).unique();
+
+export const user = mysqlTable('user', {
 	id: uuid('id').primaryKey(),
-	age: integer('age'),
-	email: text('email').notNull().unique(),
-	login: text('login').notNull().unique(),
+	age: int('age'),
+	email: uniqueText('email').notNull(),
+	login: uniqueText('login').notNull(),
 	passwordHash: text('password_hash').notNull()
 });
 export const userRelations = relations(user, ({ many }) => ({
 	groups: many(userToGroup)
 }));
 
-export const session = sqliteTable('session', {
+export const session = mysqlTable('session', {
 	id: uuid('id').primaryKey(),
-	userId: text('user_id')
+	userId: id('user_id')
 		.notNull()
 		.references(() => user.id),
-	expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull()
+	expiresAt: timestamp('expires_at').notNull()
 });
 
 export type Session = typeof session.$inferSelect;
@@ -33,12 +49,12 @@ export type User = typeof user.$inferSelect;
 ///////////
 // Anime //
 ///////////
-export const anime = sqliteTable('anime', {
+export const anime = mysqlTable('anime', {
 	id: uuid('id').primaryKey(),
-	title: text('title').notNull().unique(),
-	releaseDate: integer('release_date', { mode: 'timestamp' }).notNull(),
+	title: uniqueText('title').notNull(),
+	releaseDate: timestamp('release_date').notNull(),
 	coverImageUrl: text('cover_image_url').notNull(),
-	nsfw: integer('nsfw', { mode: 'boolean' }).default(false)
+	nsfw: boolean('nsfw').default(false)
 });
 export const animeRelations = relations(anime, ({ many }) => ({
 	episodes: many(episode)
@@ -49,10 +65,10 @@ export type Anime = typeof anime.$inferSelect;
 /////////////
 // Episode //
 /////////////
-export const episode = sqliteTable('episode', {
+export const episode = mysqlTable('episode', {
 	id: uuid('id').primaryKey(),
-	animeId: text('anime_id').notNull(),
-	episodeNumber: integer('episode_number').notNull(),
+	animeId: id('anime_id').notNull(),
+	episodeNumber: int('episode_number').notNull(),
 	title: text('title')
 });
 export const episodeRelations = relations(episode, ({ one, many }) => ({
@@ -65,9 +81,9 @@ export type Episode = typeof episode.$inferSelect;
 //////////
 // Link //
 //////////
-export const link = sqliteTable('link', {
+export const link = mysqlTable('link', {
 	id: uuid('id').primaryKey(),
-	episodeId: text('episode_id').notNull(),
+	episodeId: id('episode_id').notNull(),
 	type: text('type', { enum: ['video', 'download'] }).notNull(),
 	url: text('url').notNull()
 });
@@ -80,9 +96,9 @@ export type Link = typeof link.$inferSelect;
 ///////////
 // Group //
 ///////////
-export const group = sqliteTable('group', {
+export const group = mysqlTable('group', {
 	id: uuid('id').primaryKey(),
-	name: text('name').notNull().unique()
+	name: uniqueText('name').notNull()
 });
 export const groupRelations = relations(group, ({ many }) => ({
 	users: many(user)
@@ -91,13 +107,13 @@ export const groupRelations = relations(group, ({ many }) => ({
 ////////////////
 // User Group //
 ////////////////
-export const userToGroup = sqliteTable(
+export const userToGroup = mysqlTable(
 	'user_to_group',
 	{
-		userId: text('user_id')
+		userId: id('user_id')
 			.notNull()
 			.references(() => user.id),
-		groupId: text('group_id')
+		groupId: id('group_id')
 			.notNull()
 			.references(() => group.id),
 		role: text('role', { enum: ['user', 'mode', 'admin'] }).notNull()
