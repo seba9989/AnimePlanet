@@ -1,13 +1,4 @@
-import {
-	mysqlTable,
-	text,
-	int,
-	primaryKey,
-	timestamp,
-	boolean,
-	varchar,
-	unique
-} from 'drizzle-orm/mysql-core';
+import { sqliteTable, text, integer, primaryKey, unique } from 'drizzle-orm/sqlite-core';
 import { init } from '@paralleldrive/cuid2';
 import { relations } from 'drizzle-orm';
 
@@ -15,33 +6,31 @@ const createId = init({
 	length: 255
 });
 
-const id = (name: string) => varchar(name, { length: 255 });
+const id = (name: string) => text(name);
 
 const uuid = (name: string) =>
 	id(name)
 		.$defaultFn(() => createId())
 		.unique();
 
-const uniqueText = (name: string) => varchar(name, { length: 255 }).unique();
-
-export const user = mysqlTable('user', {
+export const user = sqliteTable('user', {
 	id: uuid('id').primaryKey(),
-	age: int('age'),
-	email: uniqueText('email').notNull(),
-	login: uniqueText('login').notNull(),
+	age: integer('age'),
+	email: text('email').unique().notNull(),
+	login: text('login').unique().notNull(),
 	passwordHash: text('password_hash').notNull(),
-	admin: boolean('admin').default(false)
+	admin: integer('admin', { mode: 'boolean' }).default(false)
 });
 export const userRelations = relations(user, ({ many }) => ({
 	groups: many(userToGroup)
 }));
 
-export const session = mysqlTable('session', {
+export const session = sqliteTable('session', {
 	id: uuid('id').primaryKey(),
 	userId: id('user_id')
 		.notNull()
 		.references(() => user.id),
-	expiresAt: timestamp('expires_at').notNull()
+	expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull()
 });
 
 export type Session = typeof session.$inferSelect;
@@ -51,12 +40,12 @@ export type User = typeof user.$inferSelect;
 ///////////
 // Anime //
 ///////////
-export const anime = mysqlTable('anime', {
+export const anime = sqliteTable('anime', {
 	id: uuid('id').primaryKey(),
-	title: uniqueText('title').notNull(),
-	releaseDate: timestamp('release_date'),
+	title: text('title').unique().notNull(),
+	releaseDate: integer('release_date', { mode: 'timestamp' }),
 	coverImageUrl: text('cover_image_url').notNull(),
-	nsfw: boolean('nsfw').default(false)
+	nsfw: integer('nsfw', { mode: 'boolean' }).default(false)
 });
 export const animeRelations = relations(anime, ({ many }) => ({
 	episodes: many(episode)
@@ -67,12 +56,12 @@ export type Anime = typeof anime.$inferSelect;
 /////////////
 // Episode //
 /////////////
-export const episode = mysqlTable(
+export const episode = sqliteTable(
 	'episode',
 	{
 		id: uuid('id').primaryKey(),
 		animeId: id('anime_id').notNull(),
-		episodeNumber: int('episode_number').notNull(),
+		episodeNumber: integer('episode_number').notNull(),
 		title: text('title')
 	},
 	(t) => ({
@@ -91,10 +80,10 @@ export type CreateEpisode = typeof episode.$inferInsert;
 ///////////
 // Video //
 ///////////
-export const video = mysqlTable('video', {
+export const video = sqliteTable('video', {
 	id: uuid('id').primaryKey(),
 	episodeId: id('episode_id').notNull(),
-	url: uniqueText('url').notNull()
+	url: text('url').unique().notNull()
 });
 export const videoRelations = relations(video, ({ one }) => ({
 	episode: one(episode, { fields: [video.episodeId], references: [episode.id] })
@@ -106,10 +95,10 @@ export type CreateVideo = typeof video.$inferInsert;
 //////////////
 // Download //
 //////////////
-export const download = mysqlTable('download', {
+export const download = sqliteTable('download', {
 	id: uuid('id').primaryKey(),
 	episodeId: id('episode_id').notNull(),
-	url: uniqueText('url').notNull()
+	url: text('url').unique().notNull()
 });
 export const downloadRelations = relations(download, ({ one }) => ({
 	episode: one(episode, { fields: [download.episodeId], references: [episode.id] })
@@ -121,9 +110,9 @@ export type CreateDownload = typeof download.$inferInsert;
 ///////////
 // Group //
 ///////////
-export const group = mysqlTable('group', {
+export const group = sqliteTable('group', {
 	id: uuid('id').primaryKey(),
-	name: uniqueText('name').notNull()
+	name: text('name').unique().notNull()
 });
 export const groupRelations = relations(group, ({ many }) => ({
 	users: many(userToGroup)
@@ -132,7 +121,7 @@ export const groupRelations = relations(group, ({ many }) => ({
 ////////////////
 // User Group //
 ////////////////
-export const userToGroup = mysqlTable(
+export const userToGroup = sqliteTable(
 	'user_to_group',
 	{
 		userId: id('user_id')
