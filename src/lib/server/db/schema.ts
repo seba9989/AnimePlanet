@@ -5,7 +5,8 @@ import {
 	primaryKey,
 	timestamp,
 	boolean,
-	varchar
+	varchar,
+	unique
 } from 'drizzle-orm/mysql-core';
 import { init } from '@paralleldrive/cuid2';
 import { relations } from 'drizzle-orm';
@@ -14,7 +15,7 @@ const createId = init({
 	length: 255
 });
 
-const id = (name: string) => varchar(name, { length: 255 }).unique();
+const id = (name: string) => varchar(name, { length: 255 });
 
 const uuid = (name: string) =>
 	id(name)
@@ -28,7 +29,8 @@ export const user = mysqlTable('user', {
 	age: int('age'),
 	email: uniqueText('email').notNull(),
 	login: uniqueText('login').notNull(),
-	passwordHash: text('password_hash').notNull()
+	passwordHash: text('password_hash').notNull(),
+	admin: boolean('admin').default(false)
 });
 export const userRelations = relations(user, ({ many }) => ({
 	groups: many(userToGroup)
@@ -52,7 +54,7 @@ export type User = typeof user.$inferSelect;
 export const anime = mysqlTable('anime', {
 	id: uuid('id').primaryKey(),
 	title: uniqueText('title').notNull(),
-	releaseDate: timestamp('release_date').notNull(),
+	releaseDate: timestamp('release_date'),
 	coverImageUrl: text('cover_image_url').notNull(),
 	nsfw: boolean('nsfw').default(false)
 });
@@ -65,33 +67,56 @@ export type Anime = typeof anime.$inferSelect;
 /////////////
 // Episode //
 /////////////
-export const episode = mysqlTable('episode', {
-	id: uuid('id').primaryKey(),
-	animeId: id('anime_id').notNull(),
-	episodeNumber: int('episode_number').notNull(),
-	title: text('title')
-});
+export const episode = mysqlTable(
+	'episode',
+	{
+		id: uuid('id').primaryKey(),
+		animeId: id('anime_id').notNull(),
+		episodeNumber: int('episode_number').notNull(),
+		title: text('title')
+	},
+	(t) => ({
+		unq: unique().on(t.animeId, t.episodeNumber)
+	})
+);
 export const episodeRelations = relations(episode, ({ one, many }) => ({
 	anime: one(anime, { fields: [episode.animeId], references: [anime.id] }),
-	links: many(link)
+	videos: many(video),
+	downloads: many(download)
 }));
 
 export type Episode = typeof episode.$inferSelect;
+export type CreateEpisode = typeof episode.$inferInsert;
 
-//////////
-// Link //
-//////////
-export const link = mysqlTable('link', {
+///////////
+// Video //
+///////////
+export const video = mysqlTable('video', {
 	id: uuid('id').primaryKey(),
 	episodeId: id('episode_id').notNull(),
-	type: text('type', { enum: ['video', 'download'] }).notNull(),
-	url: text('url').notNull()
+	url: uniqueText('url').notNull()
 });
-export const linkRelations = relations(link, ({ one }) => ({
-	episode: one(episode, { fields: [link.episodeId], references: [episode.id] })
+export const videoRelations = relations(video, ({ one }) => ({
+	episode: one(episode, { fields: [video.episodeId], references: [episode.id] })
 }));
 
-export type Link = typeof link.$inferSelect;
+export type Video = typeof video.$inferSelect;
+export type CreateVideo = typeof video.$inferInsert;
+
+//////////////
+// Download //
+//////////////
+export const download = mysqlTable('download', {
+	id: uuid('id').primaryKey(),
+	episodeId: id('episode_id').notNull(),
+	url: uniqueText('url').notNull()
+});
+export const downloadRelations = relations(download, ({ one }) => ({
+	episode: one(episode, { fields: [download.episodeId], references: [episode.id] })
+}));
+
+export type Download = typeof download.$inferSelect;
+export type CreateDownload = typeof download.$inferInsert;
 
 ///////////
 // Group //
@@ -101,7 +126,7 @@ export const group = mysqlTable('group', {
 	name: uniqueText('name').notNull()
 });
 export const groupRelations = relations(group, ({ many }) => ({
-	users: many(user)
+	users: many(userToGroup)
 }));
 
 ////////////////
