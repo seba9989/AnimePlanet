@@ -30,7 +30,7 @@ export const actions = {
 				title: animeData.title,
 				coverImageUrl: animeData.images.webp.large_image_url
 			})
-			.$returningId();
+			.returning();
 
 		const episodesData = await jikanEpisodes(animeData.mal_id);
 
@@ -54,7 +54,7 @@ export const actions = {
 				...episodeDbPrototype(animeId, episodesData),
 				{ animeId, episodeNumber: 5000, title: 'Test' }
 			])
-			.onDuplicateKeyUpdate({ set: { id: sql`id` } });
+			.onConflictDoNothing();
 		// await db.update(episode).set({})
 		return;
 	},
@@ -68,13 +68,7 @@ export const actions = {
 		if (typeof videoUrl != 'string') return error(400);
 		if (typeof downloadUrl != 'string') return error(400);
 
-		await db
-			.insert(video)
-			.values({ episodeId, url: videoUrl })
-			.onDuplicateKeyUpdate({ set: { id: sql`id` } });
-		await db
-			.insert(download)
-			.values({ episodeId, url: downloadUrl })
-			.onDuplicateKeyUpdate({ set: { id: sql`id` } });
+		await db.insert(video).values({ episodeId, url: videoUrl }).onConflictDoNothing();
+		await db.insert(download).values({ episodeId, url: downloadUrl }).onConflictDoNothing();
 	}
 } satisfies Actions;
