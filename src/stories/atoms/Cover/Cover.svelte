@@ -4,7 +4,7 @@
 
 	export interface Props extends HTMLAnchorAttributes {
 		img: string;
-		title: string;
+		title?: string;
 	}
 
 	let { class: className, img, title, href }: Props = $props();
@@ -18,11 +18,13 @@
 	)}
 	style="--bg-src: url({img});"
 >
-	<div class="flex h-1/3 w-full items-end bg-gradient-to-t from-surface-900 p-1">
-		<p class="truncate">
-			{title}
-		</p>
-	</div>
+	{#if title}
+		<div class="flex h-1/3 w-full items-end bg-gradient-to-t from-surface-900 p-1">
+			<p class="truncate">
+				{title}
+			</p>
+		</div>
+	{/if}
 </a>
 
 <style lang="postcss">

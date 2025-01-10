@@ -66,11 +66,7 @@ export const actions: Actions = {
 		const passwordHash = await hash(password, auth.hashSetting);
 
 		try {
-			await db.insert(table.user).values({ email, login, passwordHash });
-			const user = await db.query.user.findFirst({
-				where: (user, { eq }) => eq(user.login, login)
-			});
-
+			const [{id: user}] = await db.insert(table.user).values({ email, login, passwordHash }).$returningId();
 			if (!user) throw {};
 
 			const sessionToken = auth.generateSessionToken();

@@ -34,9 +34,9 @@
 	</div>
 {:else if realType == 'search'}
 	<div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', wrapperClass)}>
-		<input {...props} {type} />
+		<input {...props} disabled placeholder="Już wkrótce..." {type} />
 
-		<button class="input-group-cell preset-tonal-surface">
+		<button class="input-group-cell preset-tonal-surface" disabled>
 			<Search size="20" />
 		</button>
 	</div>
