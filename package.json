@@ -63,6 +63,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"clsx": "^2.1.1",
 		"drizzle-orm": "^0.33.0",
+		"flexsearch": "^0.7.43",
 		"lucide-svelte": "^0.469.0",
 		"svelte-motion": "^0.12.2",
 		"tailwind-merge": "^2.6.0"
