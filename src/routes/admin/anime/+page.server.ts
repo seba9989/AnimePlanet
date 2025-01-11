@@ -4,7 +4,6 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { jikanAnime, jikanEpisodes } from '$lib/utils/jikan';
 import { episodeDbPrototype } from '$lib/utils/db';
-import { sql } from 'drizzle-orm';
 
 export const load = (async () => {
 	const anime = await db.query.anime.findMany({

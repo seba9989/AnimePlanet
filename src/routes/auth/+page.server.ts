@@ -66,11 +66,14 @@ export const actions: Actions = {
 		const passwordHash = await hash(password, auth.hashSetting);
 
 		try {
-			const [{id: user}] = await db.insert(table.user).values({ email, login, passwordHash }).$returningId();
-			if (!user) throw {};
+			const [{ id: userId }] = await db
+				.insert(table.user)
+				.values({ email, login, passwordHash })
+				.returning();
+			if (!userId) throw {};
 
 			const sessionToken = auth.generateSessionToken();
-			const session = await auth.createSession(sessionToken, user.id);
+			const session = await auth.createSession(sessionToken, userId);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch {
 			return fail(500, { message: 'An error has occurred' });
