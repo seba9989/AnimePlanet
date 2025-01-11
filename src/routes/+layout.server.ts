@@ -1,5 +1,8 @@
+import { db } from '$lib/server/db';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async (event) => {
-	return { user: event.locals.user };
+	const anime = await db.query.anime.findMany();
+
+	return { user: event.locals.user, anime };
 };

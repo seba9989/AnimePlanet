@@ -3,6 +3,7 @@
 	import type { PageData } from './$types';
 	import { enhance } from '$app/forms';
 	import { fade, fly } from 'svelte/transition';
+	import { ArrowUpRight } from 'lucide-svelte';
 
 	let embeds: { body: string }[] = $state([{ body: '' }]);
 	let downloads: { body: string }[] = $state([{ body: '' }]);
@@ -46,10 +47,13 @@
 </div>
 
 {#if data.anime[0]}
-	<Accordion value={[data.anime[0].title ?? '']} collapsible>
+	<Accordion value={[data.anime[0].title]} collapsible>
 		{#each data.anime as anime}
 			<hr class="hr" />
 			<Accordion.Item value={anime.title}>
+				{#snippet lead()}<a href="anime/{anime.id}" class="btn-icon preset-tonal"
+						><ArrowUpRight /></a
+					>{/snippet}
 				{#snippet control()}{anime.title}{/snippet}
 				<!-- Panel -->
 				{#snippet panel()}
