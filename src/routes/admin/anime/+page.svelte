@@ -82,7 +82,7 @@
 										<td><input type="text" class="input" form={id} name="videoUrl" /></td>
 										<td><input type="text" class="input" form={id} name="downloadUrl" /></td>
 										<td class="!text-right">
-											<form action="?/addLinkToEpisode" {id} method="post">
+											<form action="?/addLinkToEpisode" {id} method="post" use:enhance>
 												<input type="text" class="hidden" value={id} name="episodeId" />
 												<button class="btn preset-tonal">Add link</button>
 											</form>

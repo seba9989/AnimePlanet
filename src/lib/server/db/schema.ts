@@ -48,10 +48,12 @@ export const anime = sqliteTable('anime', {
 	nsfw: integer('nsfw', { mode: 'boolean' }).default(false)
 });
 export const animeRelations = relations(anime, ({ many }) => ({
-	episodes: many(episode)
+	episodes: many(episode),
+	tags: many(tagToAnime)
 }));
 
 export type Anime = typeof anime.$inferSelect;
+export type CreateAnime = typeof anime.$inferInsert;
 
 /////////////
 // Episode //
@@ -118,9 +120,22 @@ export const groupRelations = relations(group, ({ many }) => ({
 	users: many(userToGroup)
 }));
 
-////////////////
-// User Group //
-////////////////
+//////////
+// Tags //
+//////////
+export const tag = sqliteTable('tag', {
+	name: text('name').primaryKey()
+});
+export const tagRelations = relations(tag, ({ many }) => ({
+	anime: many(tagToAnime)
+}));
+
+export type Tag = typeof tag.$inferSelect;
+export type CreateTag = typeof tag.$inferInsert;
+
+///////////////////
+// User <=> Group //
+///////////////////
 export const userToGroup = sqliteTable(
 	'user_to_group',
 	{
@@ -146,3 +161,34 @@ export const userToGroupRelations = relations(userToGroup, ({ one }) => ({
 		references: [user.id]
 	})
 }));
+
+///////////////////
+// Tag <=> Anime //
+///////////////////
+export const tagToAnime = sqliteTable(
+	'tag_to_anime',
+	{
+		tag: text('tag')
+			.notNull()
+			.references(() => tag.name),
+		animeId: id('anime_id')
+			.notNull()
+			.references(() => anime.id)
+	},
+	(t) => ({
+		pk: primaryKey({ columns: [t.tag, t.animeId] })
+	})
+);
+export const tagToAnimeRelations = relations(tagToAnime, ({ one }) => ({
+	tag: one(tag, {
+		fields: [tagToAnime.tag],
+		references: [tag.name]
+	}),
+	anime: one(anime, {
+		fields: [tagToAnime.animeId],
+		references: [anime.id]
+	})
+}));
+
+export type TagsInAnime = typeof tagToAnime.$inferSelect;
+export type CreateTagToAnime = typeof tagToAnime.$inferInsert;

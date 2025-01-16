@@ -1,3 +1,4 @@
+// Anime
 export interface Anime {
 	pagination: Pagination;
 	data: AnimeData[];
@@ -29,6 +30,14 @@ export interface AnimeData {
 	background: string;
 	season?: string;
 	year?: number;
+	genres: Genre[];
+}
+
+export interface Genre {
+	mal_id: number;
+	type: string;
+	name: string;
+	url: string;
 }
 
 export interface Images {
@@ -41,14 +50,10 @@ export interface Webp {
 	large_image_url: string;
 }
 
+// Episode
 export interface Episodes {
 	pagination: Pagination;
 	data: EpisodeData[];
-}
-
-export interface Pagination {
-	last_visible_page: number;
-	has_next_page: boolean;
 }
 
 export interface EpisodeData {
@@ -62,4 +67,10 @@ export interface EpisodeData {
 	filler: boolean;
 	recap: boolean;
 	forum_url: string;
+}
+
+// Ogólne
+export interface Pagination {
+	last_visible_page: number;
+	has_next_page: boolean;
 }

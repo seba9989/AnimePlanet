@@ -1,58 +1,43 @@
-import FlexSearch from 'flexsearch';
-import type { Anime } from './server/db/schema';
+import MiniSearch from 'minisearch';
+import type { Anime, TagsInAnime } from './server/db/schema';
 
-let animeIndex: FlexSearch.Document<unknown>;
-let anime: Anime[];
+interface AnimeWithTags extends Anime {
+	tags: TagsInAnime[];
+}
 
-export function createAnimeIndex(data: Anime[]) {
-	// create the posts index
-	animeIndex = new FlexSearch.Document({
-		tokenize: 'forward',
-		document: {
-			id: 'index',
-			index: 'title',
-			tag: 'tag'
+let animeSearch: MiniSearch;
+let anime: AnimeWithTags[];
+
+export function createAnimeIndex(data: AnimeWithTags[]) {
+	anime = data;
+
+	animeSearch = new MiniSearch({
+		idField: 'index',
+		fields: ['title'],
+		storeFields: ['title', 'tags']
+	});
+
+	data.forEach((anime, index) => {
+		const tags = anime.tags.map(({ tag }) => tag);
+		animeSearch.add({ index, title: anime.title, tags });
+	});
+}
+
+export function searchAnimeIndex(searchTitle: string | null, tags: string[] | string = []) {
+	if (searchTitle == '') searchTitle = null;
+	if (tags == '' || typeof tags == 'string') tags = [];
+	const searchTags = new Set(tags);
+
+	const results = animeSearch.search(searchTitle ?? MiniSearch.wildcard, {
+		prefix: true,
+		filter: (result) => {
+			const animeTags = new Set(result.tags as string[]);
+
+			return animeTags.isSupersetOf(searchTags);
 		}
 	});
 
-	data.forEach((anime, i) => {
-		animeIndex.add({ index: i, title: anime.title, tag: anime.nsfw ? 'nsfw' : false });
-	});
+	if (!results) return;
 
-	console.log(
-		animeIndex.search('sdasdasdasd', {
-			index: ['title'],
-			tag: undefined,
-			bool: 'and'
-		})
-	);
-
-	anime = data;
-}
-
-export function searchAnimeIndex(searchTitle: string | undefined | null, tags?: string[] | null) {
-	if (!searchTitle) return anime;
-	if (!tags) tags = undefined;
-	// escape special regex characters
-	const match = searchTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-	// return matching post indexes 💪
-	const search = animeIndex.search(match, {
-		index: ['title']
-		// tag: tags,
-		// bool: 'and'
-	});
-	if (search.length <= 0) return;
-
-	const [{ result }] = search;
-
-	// return { test: 'test' };
-	return (
-		result
-			// filter the posts based on the matched index
-			.map((index) => anime[index as number])
-			// you can do whatever you want at this point 👌
-			.map((anime) => {
-				return anime;
-			})
-	);
+	return results.map(({ id }) => anime[id]);
 }

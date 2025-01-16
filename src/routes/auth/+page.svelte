@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class=" card m-auto grid w-full max-w-2xl grid-cols-2 divide-x border-[1px] border-surface-200-800 divide-surface-200-800 preset-filled-surface-100-900 *:p-4"
+	class=" card m-auto grid w-full max-w-2xl divide-y border-[1px] border-surface-200-800 divide-surface-200-800 preset-filled-surface-100-900 *:p-4 sm:grid-cols-2 md:divide-x"
 >
 	<form method="post" action="?/login" class="flex flex-col justify-between gap-4" use:enhance>
 		<h2 class="h3 text-center">Zaloguj się</h2>

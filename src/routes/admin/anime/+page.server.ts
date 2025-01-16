@@ -1,9 +1,9 @@
 import { db } from '$lib/server/db';
-import { anime, download, episode, video } from '$lib/server/db/schema';
+import { anime, download, episode, tag, tagToAnime, video } from '$lib/server/db/schema';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { jikanAnime, jikanEpisodes } from '$lib/utils/jikan';
-import { episodeDbPrototype } from '$lib/utils/db';
+import { episodeDbPrototype, tagDbPrototype, tagToAnimeDbPrototype } from '$lib/utils/db';
 
 export const load = (async () => {
 	const anime = await db.query.anime.findMany({
@@ -30,6 +30,10 @@ export const actions = {
 				coverImageUrl: animeData.images.webp.large_image_url
 			})
 			.returning();
+
+		await db.insert(tag).values(tagDbPrototype(animeData)).onConflictDoNothing();
+
+		await db.insert(tagToAnime).values(tagToAnimeDbPrototype(animeId, animeData));
 
 		const episodesData = await jikanEpisodes(animeData.mal_id);
 

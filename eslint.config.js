@@ -30,5 +30,5 @@ export default ts.config(
 				parser: ts.parser
 			}
 		}
-	}
+	},
 );

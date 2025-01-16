@@ -5,6 +5,7 @@ import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
 
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
 
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}', contentPath(import.meta.url, 'svelte')],
@@ -21,6 +22,18 @@ export default {
 			// NOTE: each theme included will increase the size of your CSS bundle
 			themes: [themes.cerberus, themes.mint, themes.mona, themes.pine]
 			// themes: [...themes]
+		}),
+		plugin(({ matchUtilities, theme }) => {
+			matchUtilities(
+				{
+					'grid-grow': (value) => ({
+						'grid-template-columns': `repeat(auto-fit, minmax(${value}, 1fr))`
+					})
+				},
+				{
+					values: theme('width')
+				}
+			);
 		})
 	]
 } satisfies Config;
