@@ -33,7 +33,7 @@ export const actions = {
 
 		await db.insert(tag).values(tagDbPrototype(animeData)).onConflictDoNothing();
 
-		await db.insert(tagToAnime).values(tagToAnimeDbPrototype(animeId, animeData));
+		await db.insert(tagToAnime).values(tagToAnimeDbPrototype({ animeId, animeData }));
 
 		const episodesData = await jikanEpisodes(animeData.mal_id);
 
@@ -53,12 +53,8 @@ export const actions = {
 		const episodesData = await jikanEpisodes(mal_id);
 		await db
 			.insert(episode)
-			.values([
-				...episodeDbPrototype(animeId, episodesData),
-				{ animeId, episodeNumber: 5000, title: 'Test' }
-			])
+			.values(episodeDbPrototype(animeId, episodesData))
 			.onConflictDoNothing();
-		// await db.update(episode).set({})
 		return;
 	},
 	addLinkToEpisode: async (event) => {

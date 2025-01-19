@@ -26,17 +26,32 @@ export const tagDbPrototype = (animeData: AnimeData): CreateTag[] => {
 	return tags;
 };
 
-export const tagToAnimeDbPrototype = (
-	animeId: string,
-	animeData: AnimeData
-): CreateTagToAnime[] => {
-	let tags: CreateTagToAnime[] = [];
+export const tagToAnimeDbPrototype = ({
+	animeId,
+	animeData,
+	tags
+}: {
+	animeId: string;
+	animeData?: AnimeData;
+	tags?: string[];
+}): CreateTagToAnime[] => {
+	let tagsToReturn: CreateTagToAnime[] = [];
 
-	const { genres } = animeData;
+	if (animeData) {
+		const { genres } = animeData;
 
-	for (const { name } of genres) {
-		tags = [{ animeId, tag: name }, ...tags];
+		for (const { name } of genres) {
+			tagsToReturn = [{ animeId, tag: name }, ...tagsToReturn];
+		}
 	}
 
-	return tags;
+	if (tags) {
+		for (const name of tags) {
+			tagsToReturn = [{ animeId, tag: name }, ...tagsToReturn];
+		}
+	}
+
+	return tagsToReturn;
 };
+
+// export const tagToAnimeDbPrototype

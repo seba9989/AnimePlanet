@@ -23,3 +23,15 @@ export function passwordsEqual(passwords: FormDataEntryValue[]) {
 		return;
 	}
 }
+
+export const textareaToStringArray = (textarea: FormDataEntryValue | null) => {
+	if (typeof textarea != 'string') return [];
+
+	let stringArray = textarea.split('\n');
+
+	stringArray = stringArray.map((value) => value.replaceAll(/[\r ]/gm, ''));
+
+	stringArray = stringArray.filter((value) => value != '');
+
+	return stringArray;
+};

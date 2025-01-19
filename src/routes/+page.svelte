@@ -10,7 +10,7 @@
 		{@const anime = data.anime}
 		<div class="grid gap-4 grid-grow-36 md:grid-grow-44">
 			{#each anime as anime (anime.title)}
-				<div>
+				<div class="max-w-60">
 					<Cover img={anime.coverImageUrl} title={anime.title} href="/anime/{anime.id}" />
 				</div>
 			{/each}
