@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Cover from '$components/atoms/Cover/Cover.svelte';
 	import { CircleX } from 'lucide-svelte';
 	import { flip } from 'svelte/animate';
@@ -7,16 +8,23 @@
 	let { data } = $props();
 	const { anime, tags } = data;
 
-	let saveMode = $state(false);
-	const changeMode = () => (saveMode = !saveMode);
+	let saveMode = $state(true);
+	const changeMode = () => {
+		console.log(animeTags);
+
+		return (saveMode = !saveMode);
+	};
 
 	let animeTags = $state(anime.tags.map(({ tag }) => tag));
 	let newTag: string = $state(tags[0].name);
+
 	const addTag = () => {
-		const _animeTags = new Set(animeTags);
-		_animeTags.add(newTag);
+		const _newTag = $state.snapshot(newTag);
+
+		const _animeTags = new Set([...animeTags, _newTag]);
 		animeTags = [..._animeTags];
 	};
+
 	const removeTag = (tag: string) => {
 		const _animeTags = new Set(animeTags);
 		_animeTags.delete(tag);
@@ -25,11 +33,23 @@
 </script>
 
 <!-- <pre>{JSON.stringify(data.anime, null, 2)}</pre> -->
-<div class="flex flex-col gap-4">
+<form
+	class="flex flex-col gap-4"
+	action="?/save"
+	method="post"
+	use:enhance={() => {
+		return async ({ result }) => {
+			// console.log(result);
+			if (result.type == 'success') {
+				changeMode();
+			}
+		};
+	}}
+>
 	{#if saveMode}
-		<button onclick={changeMode} class="btn ml-auto preset-filled">Edit</button>
+		<button onclick={changeMode} type="button" class="btn ml-auto preset-filled">Edit</button>
 	{:else}
-		<button onclick={changeMode} class="btn ml-auto preset-tonal-primary">Save</button>
+		<button type="submit" class="btn ml-auto preset-tonal-primary">Save</button>
 	{/if}
 	<div class="grid grid-cols-[auto_1fr_1fr_1fr] gap-4">
 		<Cover img={anime.coverImageUrl} />
@@ -39,7 +59,7 @@
 		>
 			<div>
 				<h2 class="h4">Title</h2>
-				<p>{anime.title}</p>
+				<input type="text" class="input" value={anime.title} name="title" disabled={saveMode} />
 			</div>
 			<div>
 				<h2 class="h4">Tags</h2>
@@ -51,6 +71,7 @@
 							class="badge preset-filled"
 							onclick={() => removeTag(tag)}
 							disabled={saveMode}
+							type="button"
 						>
 							<CircleX size="16" />
 							<span>
@@ -69,6 +90,7 @@
 						class="input-group-cell preset-tonal-surface"
 						disabled={saveMode}
 						onclick={addTag}
+						type="button"
 					>
 						Add
 					</button>
@@ -78,12 +100,22 @@
 
 		<label class="label flex flex-col">
 			<span class="label-text">Embeds</span>
-			<textarea class="textarea h-full overflow-visible" disabled={saveMode}></textarea>
+			<textarea
+				class="textarea h-full overflow-visible"
+				name="embeds"
+				placeholder="Don't work yet."
+				disabled
+			></textarea>
 		</label>
 		<label class="label flex flex-col">
 			<span class="label-text">Downloads</span>
-			<textarea class="textarea h-full overflow-visible" disabled={saveMode}></textarea>
+			<textarea
+				class="textarea h-full overflow-visible"
+				name="downloads"
+				placeholder="Don't work yet."
+				disabled
+			></textarea>
 		</label>
 	</div>
-</div>
+</form>
 <!-- <div>Test {JSON.stringify(page.params)}</div> -->

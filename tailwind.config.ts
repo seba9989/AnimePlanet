@@ -27,7 +27,7 @@ export default {
 			matchUtilities(
 				{
 					'grid-grow': (value) => ({
-						'grid-template-columns': `repeat(auto-fit, minmax(${value}, 1fr))`
+						'grid-template-columns': `repeat(auto-fill, minmax(${value}, 1fr))`
 					})
 				},
 				{
