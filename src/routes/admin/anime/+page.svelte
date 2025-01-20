@@ -2,15 +2,11 @@
 	import { Accordion, Modal } from '@skeletonlabs/skeleton-svelte';
 	import type { PageData } from './$types';
 	import { enhance } from '$app/forms';
-	import { fade, fly } from 'svelte/transition';
 	import { ArrowUpRight } from 'lucide-svelte';
-
-	let embeds: { body: string }[] = $state([{ body: '' }]);
-	let downloads: { body: string }[] = $state([{ body: '' }]);
+	import { goto } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
 
-	// let group = $state([data.anime[0].title]);
 	let openState = $state(false);
 
 	function modalClose() {
@@ -30,7 +26,19 @@
 			<header class="flex justify-between">
 				<h2 class="h2">Add Anime</h2>
 			</header>
-			<form action="?/addAnime" method="post" class="flex flex-col gap-4">
+			<form
+				action="?/addAnime"
+				method="post"
+				class="flex flex-col gap-4"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type == 'success') {
+							goto('/admin/anime', { invalidateAll: true });
+							modalClose();
+						}
+					};
+				}}
+			>
 				<input
 					name="title"
 					type="text"

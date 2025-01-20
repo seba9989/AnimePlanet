@@ -39,7 +39,6 @@
 	method="post"
 	use:enhance={() => {
 		return async ({ result }) => {
-			// console.log(result);
 			if (result.type == 'success') {
 				changeMode();
 			}
