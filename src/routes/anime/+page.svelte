@@ -8,6 +8,7 @@
 	import { scale } from 'svelte/transition';
 	import Search from '$components/atoms/Input/Search/Search.svelte';
 	import Cover from '$components/atoms/Cover/Cover.svelte';
+	import AnimeList from '$components/organisms/AnimeList/AnimeList.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -53,11 +54,5 @@
 </form>
 
 {#if anime}
-	<div class="grid gap-4 grid-grow-36 md:grid-grow-44">
-		{#each anime as anime (anime.title)}
-			<div animate:flip={{ duration: 500 }} in:scale={{ duration: 500 }}>
-				<Cover img={anime.coverImageUrl} title={anime.title} href="/anime/{anime.id}" />
-			</div>
-		{/each}
-	</div>
+	<AnimeList {anime} />
 {/if}
