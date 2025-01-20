@@ -12,7 +12,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let anime: Anime[] | undefined = $state(data.anime);
+	let anime: Anime[] = $state(data.anime);
 
 	createAnimeIndex(data.anime);
 
@@ -21,7 +21,7 @@
 		const title = page.url.searchParams.get('title');
 		const tags = page.url.searchParams.get('tags')?.split(',');
 
-		anime = searchAnimeIndex(title, tags);
+		anime = searchAnimeIndex(title, tags) ?? [];
 	});
 
 	const tagsChange = () => {
@@ -53,6 +53,4 @@
 	{/each}
 </form>
 
-{#if anime}
-	<AnimeList {anime} />
-{/if}
+<AnimeList {anime} />
