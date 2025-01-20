@@ -1,12 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/state';
 	import Cover from '$components/atoms/Cover/Cover.svelte';
+	import { urlToHosting } from '$lib/utils/urlToHosting.js';
+	import { Accordion } from '@skeletonlabs/skeleton-svelte';
 	import { CircleX } from 'lucide-svelte';
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
 
 	let { data } = $props();
-	const { anime, tags } = data;
+	let {
+		anime: { episodes, ...anime },
+		tags
+	} = $derived(data);
 
 	let saveMode = $state(true);
 	const changeMode = () => {
@@ -15,8 +22,8 @@
 		return (saveMode = !saveMode);
 	};
 
-	let animeTags = $state(anime.tags.map(({ tag }) => tag));
-	let newTag: string = $state(tags[0].name);
+	let animeTags = $state(data.anime.tags.map(({ tag }) => tag));
+	let newTag: string = $state(data.tags[0].name);
 
 	const addTag = () => {
 		const _newTag = $state.snapshot(newTag);
@@ -32,7 +39,6 @@
 	};
 </script>
 
-<!-- <pre>{JSON.stringify(data.anime, null, 2)}</pre> -->
 <form
 	class="flex flex-col gap-4"
 	action="?/save"
@@ -76,6 +82,7 @@
 							<span>
 								{tag}
 							</span>
+							<input checked type="checkbox" value={tag} name="tag" class="hidden" />
 						</button>
 					{/each}
 				</div>
@@ -117,4 +124,66 @@
 		</label>
 	</div>
 </form>
-<!-- <div>Test {JSON.stringify(page.params)}</div> -->
+
+<Accordion collapsible>
+	{#each episodes as episode}
+		<hr class="hr" />
+		<Accordion.Item value={episode.id}>
+			{#snippet lead()}
+				<form action="?/sendEpisode" method="post" use:enhance>
+					<input checked type="radio" class="hidden" value={episode.id} name="episodeId" />
+					<button class="btn preset-tonal">Send to discord</button>
+				</form>
+			{/snippet}
+			{#snippet control()}{episode.title}{/snippet}
+			<!-- Panel -->
+			{#snippet panel()}
+				<div class="table-wrap">
+					<table class="table caption-bottom">
+						<thead>
+							<tr>
+								<th>Np.</th>
+								<th>Hosting</th>
+								<th>Link</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody class="hover:[&>tr]:preset-tonal-primary">
+							{#each episode.videos as video, i}
+								<tr>
+									<td> {i}</td>
+									<td>{urlToHosting(video.url)}</td>
+									<td><a href={video.url} class="anchor">{video.url}</a></td>
+									<td class="!text-right">
+										<form
+											action="?/removeLink"
+											id={video.id}
+											method="post"
+											use:enhance={() => {
+												return async ({ result }) => {
+													if (result.type == 'success') {
+														goto(page.url.pathname, {
+															invalidateAll: true,
+															keepFocus: true,
+															noScroll: true
+														});
+													}
+												};
+											}}
+										>
+											<input type="radio" class="hidden" checked value={video.id} name="videoId" />
+											<button class="btn preset-tonal" type="submit">Remove link</button>
+										</form>
+									</td>
+								</tr>
+							{/each}
+							<tr></tr>
+						</tbody>
+					</table>
+				</div>
+			{/snippet}
+		</Accordion.Item>
+	{/each}
+</Accordion>
+
+<!-- <pre>{JSON.stringify(data.anime, null, 2)}</pre> -->
