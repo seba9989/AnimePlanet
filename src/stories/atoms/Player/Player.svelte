@@ -1,12 +1,11 @@
 <script lang="ts">
+	import { urlToHosting } from '$lib/utils/urlToHosting';
 	import { ArrowUpRight } from 'lucide-svelte';
 
 	let { episode } = $props();
 
 	let player = $state(episode.videos[0].url ?? '');
 
-	const hostingReg = /https:\/\/([\w.]+)\/.*/;
-	const urlToHost = (url: string) => hostingReg.exec(url)?.at(1);
 	let isFilemoon = $derived(/https:\/\/(\w+)/.exec(player)?.at(1) == 'filemoon');
 </script>
 
@@ -42,7 +41,7 @@
 	<div class="flex w-full flex-col gap-4 xl:w-fit">
 		<select bind:value={player} class="select">
 			{#each episode.videos as video}
-				<option value={video.url}>{urlToHost(video.url)}</option>
+				<option value={video.url}>{urlToHosting(video.url)}</option>
 			{/each}
 		</select>
 		{#if episode.downloads[0]}
@@ -55,13 +54,12 @@
 						</tr>
 					</thead>
 					<tbody class="hover:[&>tr]:preset-tonal-primary">
-						{#each episode.downloads as downloads}
-							{@const name = hostingReg.exec(downloads.url)?.at(1)}
+						{#each episode.downloads as download}
 							<tr>
-								<td>{name}</td>
-								<td class="hidden md:block">{downloads.url}</td>
+								<td>{urlToHosting(download.url)}</td>
+								<td class="hidden md:block">{download.url}</td>
 								<td class="text-right">
-									<a href={downloads.url} class="btn preset-outlined">
+									<a href={download.url} class="btn preset-outlined">
 										<ArrowUpRight />
 										Download
 									</a>
