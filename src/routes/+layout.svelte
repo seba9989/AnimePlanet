@@ -11,7 +11,7 @@
 
 <div class="flex h-screen w-screen flex-col">
 	<Header />
-	<div class=" grid gap-4 px-4 py-2">
+	<div class="grid gap-4 px-4 py-2">
 		{@render children()}
 	</div>
 </div>

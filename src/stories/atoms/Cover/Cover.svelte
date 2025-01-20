@@ -13,7 +13,7 @@
 <a
 	{href}
 	class={cn(
-		'cover flex w-full items-end overflow-hidden drop-shadow-md preset-filled-surface-100-900 hover:drop-shadow-xl',
+		'cover flex w-full max-w-60 items-end overflow-hidden drop-shadow-md preset-filled-surface-100-900 hover:drop-shadow-xl',
 		className
 	)}
 	style="--bg-src: url({img});"
