@@ -3,11 +3,11 @@ import { db } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 
 import type { Actions, PageServerLoad } from './$types';
-import { textareaToStringArray } from '$lib/utils/form';
-import { tagToAnime, video } from '$lib/server/db/schema';
-import { tagToAnimeDbPrototype } from '$lib/utils/db';
-import { eq } from 'drizzle-orm';
 import { send } from '$lib/server/discord';
+import { validForm } from '$lib/server/utils/formValidator';
+import vine from '@vinejs/vine';
+import { removeLink, updateAnimeById } from '$lib/server/db/utils/creators';
+import { jsonString } from '$lib/server/utils/customVien';
 
 export const load = (async (event) => {
 	const animeId = event.params.animeId;
@@ -32,33 +32,59 @@ export const load = (async (event) => {
 	return { anime, tags };
 }) satisfies PageServerLoad;
 
+const linkSchema = vine
+	.array(
+		jsonString({
+			episodeId: vine.string(),
+			url: vine.string().url()
+		})
+	)
+	.parse((value) => {
+		if (vine.helpers.isArray(value)) return value;
+		if (typeof value === 'string') return [value];
+		return;
+	})
+	.optional();
+
+const saveSchema = vine.object({
+	title: vine.string().minLength(1),
+	tags: vine.array(vine.string()),
+	embeds: linkSchema,
+	downloads: linkSchema
+});
+
+const removeLinkSchema = vine.object({
+	id: vine.string()
+});
+
 export const actions = {
 	save: async (event) => {
 		const formData = await event.request.formData();
+		const { data, errors } = await validForm(formData, saveSchema);
+
 		const animeId = event.params.animeId;
-		const tags = formData.getAll('tag') as string[];
 
-		const embeds = textareaToStringArray(formData.get('embeds'));
-		const downloads = textareaToStringArray(formData.get('downloads'));
+		if (errors) return error(400, { message: errors.join('. ') + '.' });
 
-		console.log(embeds);
-		console.log(downloads);
-
-		console.log(tags);
-
-		await db
-			.insert(tagToAnime)
-			.values(tagToAnimeDbPrototype({ animeId, tags }))
-			.onConflictDoNothing();
+		await updateAnimeById({ id: animeId, ...data });
 	},
-	removeLink: async (event) => {
+	removeVideo: async (event) => {
 		const formData = await event.request.formData();
-		const videoId = formData.get('videoId') as string;
+		const { data, errors } = await validForm(formData, removeLinkSchema);
 
-		console.log(videoId);
+		if (errors) return error(400, { message: errors.join('. ') + '.' });
 
-		await db.delete(video).where(eq(video.id, videoId));
+		await removeLink({ type: 'video', ...data });
 	},
+	removeDownload: async (event) => {
+		const formData = await event.request.formData();
+		const { data, errors } = await validForm(formData, removeLinkSchema);
+
+		if (errors) return error(400, { message: errors.join('. ') + '.' });
+
+		await removeLink({ type: 'download', ...data });
+	},
+	// TODO: Automate sending notification
 	sendEpisode: async (event) => {
 		const formData = await event.request.formData();
 		const episodeId = formData.get('episodeId') as string;

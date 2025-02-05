@@ -1,17 +1,16 @@
 <script lang="ts">
-	import Header from '$components/organisms/Header/Header.svelte';
 	import '../app.css';
-	import { userData } from '$lib/states/user.svelte';
+	import Header from '$components/organisms/Header/Header.svelte';
+	import { ToastProvider } from '@skeletonlabs/skeleton-svelte';
 
-	let { data, children } = $props();
-	$effect(() => {
-		userData.set(data.user);
-	});
+	let { children } = $props();
 </script>
 
-<div class="flex h-screen w-screen flex-col">
-	<Header />
-	<div class="grid gap-4 px-4 py-2">
-		{@render children()}
+<ToastProvider>
+	<div class="flex h-screen w-screen flex-col">
+		<Header />
+		<div class="grid gap-4 px-4 py-2">
+			{@render children()}
+		</div>
 	</div>
-</div>
+</ToastProvider>

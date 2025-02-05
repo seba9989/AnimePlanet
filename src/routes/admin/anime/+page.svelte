@@ -1,11 +1,16 @@
 <script lang="ts">
 	import { Accordion, Modal } from '@skeletonlabs/skeleton-svelte';
 	import type { PageData } from './$types';
-	import { enhance } from '$app/forms';
 	import { ArrowUpRight } from 'lucide-svelte';
-	import { goto } from '$app/navigation';
+	import { jikanAnimeByTitle } from '$lib/apiHandlers/jikan';
+	import Form from '$components/molecules/Form/Form.svelte';
+	import Confirm from '$components/atoms/Button/Confirm/Confirm.svelte';
 
 	let { data }: { data: PageData } = $props();
+
+	let { anime } = $derived(data);
+
+	let title = $state('');
 
 	let openState = $state(false);
 
@@ -18,7 +23,7 @@
 	<Modal
 		bind:open={openState}
 		triggerBase="btn preset-tonal"
-		contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
+		contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-md  w-[90%] max-w-screen-md"
 		backdropClasses="backdrop-blur-sm"
 	>
 		{#snippet trigger()}Add Anime{/snippet}
@@ -26,37 +31,45 @@
 			<header class="flex justify-between">
 				<h2 class="h2">Add Anime</h2>
 			</header>
-			<form
-				action="?/addAnime"
-				method="post"
-				class="flex flex-col gap-4"
-				use:enhance={() => {
-					return async ({ result }) => {
-						if (result.type == 'success') {
-							goto('/admin/anime', { invalidateAll: true });
-							modalClose();
-						}
-					};
-				}}
-			>
-				<input
-					name="title"
-					type="text"
-					class="input"
-					placeholder="Ore dake Level Up na Ken: Season 2 - Arise from the Shadow"
-				/>
+			<Form action="?/addAnime" class="flex flex-col gap-4" onAll={modalClose}>
+				<div class="input-group grid-flow-row divide-x divide-surface-200-800">
+					<input
+						name="title"
+						type="text"
+						bind:value={title}
+						placeholder="Ore dake Level Up na Ken: Season 2 - Arise from the Shadow"
+					/>
+				</div>
+				<select class="select overflow-auto" name="malId" size="4" value="1">
+					{#await jikanAnimeByTitle(title)}
+						{#each new Array(4) as _}
+							<option class="">&nbsp;</option>
+						{/each}
+					{:then anime}
+						{#if anime.length > 0}
+							{#each anime as anime}
+								<option value={anime.mal_id}>{anime.title}</option>
+							{/each}
+						{:else}
+							{#each new Array(4) as _}
+								<option class="">&nbsp;</option>
+							{/each}
+						{/if}
+					{/await}
+				</select>
+
 				<div class="ml-auto flex gap-4">
 					<button type="button" class="btn preset-tonal" onclick={modalClose}>Cancel</button>
-					<button type="submit" class="btn preset-filled">Confirm</button>
+					<Confirm>Confirm</Confirm>
 				</div>
-			</form>
+			</Form>
 		{/snippet}
 	</Modal>
 </div>
 
-{#if data.anime[0]}
-	<Accordion value={[data.anime[0].title]} collapsible>
-		{#each data.anime as anime}
+{#if anime[0]}
+	<Accordion collapsible>
+		{#each anime as anime}
 			<hr class="hr" />
 			<Accordion.Item value={anime.title}>
 				{#snippet lead()}<a href="anime/{anime.id}" class="btn-icon preset-tonal"
@@ -74,26 +87,42 @@
 									<th>Video</th>
 									<th>Download</th>
 									<th class="!text-right">
-										<form action="?/updateEpisodesList" method="post" use:enhance>
-											<input type="text" class="hidden" name="animeId" value={anime.id} />
-											<input type="text" class="hidden" name="animeTitle" value={anime.title} />
-											<button class="btn preset-filled">Update list</button>
-										</form>
+										{#if anime.malId}
+											<Form action="?/updateEpisodesList" onAll={modalClose}>
+												<input
+													type="checkbox"
+													checked
+													class="hidden"
+													name="animeId"
+													value={anime.id}
+												/>
+												<input
+													type="checkbox"
+													checked
+													class="hidden"
+													name="malId"
+													value={anime.malId}
+												/>
+												<Confirm>Update list</Confirm>
+											</Form>
+										{/if}
 									</th>
 								</tr>
 							</thead>
 							<tbody class="hover:[&>tr]:preset-tonal-primary">
 								{#each anime.episodes as { episodeNumber, title, id }}
 									<tr>
-										<td> {episodeNumber}</td>
+										<td>
+											{episodeNumber}
+										</td>
 										<td>{title}</td>
 										<td><input type="text" class="input" form={id} name="videoUrl" /></td>
 										<td><input type="text" class="input" form={id} name="downloadUrl" /></td>
 										<td class="!text-right">
-											<form action="?/addLinkToEpisode" {id} method="post" use:enhance>
+											<Form action="?/addLinkToEpisode" {id}>
 												<input type="text" class="hidden" value={id} name="episodeId" />
-												<button class="btn preset-tonal">Add link</button>
-											</form>
+												<Confirm>Add link</Confirm>
+											</Form>
 										</td>
 									</tr>
 								{/each}

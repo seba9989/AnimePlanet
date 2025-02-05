@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { userData } from '$lib/states/user.svelte';
+	import { page } from '$app/state';
 	import { Facebook, Instagram } from 'lucide-svelte';
 
 	let { onclick }: { onclick?: () => void } = $props();
@@ -34,7 +34,7 @@
 		</a>
 	</div>
 	<button {onclick} class="md:w-fit">
-		{#if !!$userData}
+		{#if !!page.data.user}
 			<form method="post" action="/auth?/logout" use:enhance>
 				<input type="submit" class="btn w-full preset-filled" value="Wyloguj się" />
 			</form>
