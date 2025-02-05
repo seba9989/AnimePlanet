@@ -1,6 +1,7 @@
 import { sqliteTable, text, integer, primaryKey, unique } from 'drizzle-orm/sqlite-core';
 import { init } from '@paralleldrive/cuid2';
 import { relations } from 'drizzle-orm';
+import type { Prettify } from '$lib/types/pretty';
 
 const createId = init({
 	length: 255
@@ -43,9 +44,10 @@ export type User = typeof user.$inferSelect;
 export const anime = sqliteTable('anime', {
 	id: uuid('id').primaryKey(),
 	title: text('title').unique().notNull(),
-	releaseDate: integer('release_date', { mode: 'timestamp' }),
+	releaseDate: integer('release_date', { mode: 'timestamp' }).notNull(),
 	coverImageUrl: text('cover_image_url').notNull(),
-	nsfw: integer('nsfw', { mode: 'boolean' }).default(false)
+	nsfw: integer('nsfw', { mode: 'boolean' }).default(false),
+	malId: integer('mal_id')
 });
 export const animeRelations = relations(anime, ({ many }) => ({
 	episodes: many(episode),
@@ -64,7 +66,7 @@ export const episode = sqliteTable(
 		id: uuid('id').primaryKey(),
 		animeId: id('anime_id').notNull(),
 		episodeNumber: integer('episode_number').notNull(),
-		title: text('title')
+		title: text('title').notNull()
 	},
 	(t) => ({
 		unq: unique().on(t.animeId, t.episodeNumber)
@@ -108,6 +110,12 @@ export const downloadRelations = relations(download, ({ one }) => ({
 
 export type Download = typeof download.$inferSelect;
 export type CreateDownload = typeof download.$inferInsert;
+
+/////////////////
+// Link - Type //
+/////////////////
+export type Link = Prettify<Video & Download>;
+export type CreateLink = Prettify<CreateVideo & CreateDownload>;
 
 ///////////
 // Group //
@@ -190,5 +198,5 @@ export const tagToAnimeRelations = relations(tagToAnime, ({ one }) => ({
 	})
 }));
 
-export type TagsInAnime = typeof tagToAnime.$inferSelect;
+export type TagInAnime = typeof tagToAnime.$inferSelect;
 export type CreateTagToAnime = typeof tagToAnime.$inferInsert;

@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Input from '$components/atoms/Input/Input.svelte';
-
-	let { form } = $props();
-	// console.log(form);
+	import Form from '$components/molecules/Form/Form.svelte';
 </script>
 
 <div
 	class=" card m-auto grid w-full max-w-2xl divide-y border-[1px] border-surface-200-800 divide-surface-200-800 preset-filled-surface-100-900 *:p-4 sm:grid-cols-2 md:divide-x"
 >
-	<form method="post" action="?/login" class="flex flex-col justify-between gap-4" use:enhance>
+	<Form method="post" action="?/login" class="flex flex-col justify-between gap-4">
 		<h2 class="h3 text-center">Zaloguj się</h2>
 		<div class=" flex flex-col gap-4">
 			<Input type="text" name="login" placeholder="Login" />
@@ -20,9 +18,8 @@
 		</div>
 
 		<button class="btn preset-filled-surface-50-950">Zaloguj się</button>
-		<!-- {JSON.stringify(form?.error)} -->
-	</form>
-	<form method="post" action="?/register" class="flex flex-col justify-between gap-4" use:enhance>
+	</Form>
+	<Form method="post" action="?/register" class="flex flex-col justify-between gap-4">
 		<h2 class="h3 text-center">Zarejestruj się</h2>
 		<div class=" flex flex-col gap-4">
 			<Input type="text" name="login" placeholder="Login" />
@@ -32,5 +29,5 @@
 		</div>
 
 		<button class="btn preset-filled-surface-50-950">Zarejestruj się</button>
-	</form>
+	</Form>
 </div>

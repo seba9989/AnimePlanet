@@ -1,10 +1,11 @@
 import { hash, verify } from '@node-rs/argon2';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
-import { passwordsEqual, validateEmail, validateLogin, validatePassword } from '$lib/utils/form';
+import vine from '@vinejs/vine';
+import { validForm } from '$lib/server/utils/formValidator';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
@@ -13,32 +14,42 @@ export const load: PageServerLoad = async (event) => {
 	return {};
 };
 
+const loginSchema = vine.object({
+	login: vine.string().minLength(1).maxLength(255),
+	password: vine.string().minLength(8).maxLength(255)
+});
+
+const registerSchema = vine.object({
+	email: vine.string().email(),
+	login: vine.string().minLength(1).maxLength(255),
+	password: vine
+		.string()
+		.minLength(8)
+		.maxLength(255)
+		.parse((values) => {
+			if (vine.helpers.isArray(values) && values.every((v) => v === values[0])) return values[0];
+			return;
+		})
+});
+
 export const actions: Actions = {
 	login: async (event) => {
 		const formData = await event.request.formData();
-		const login = formData.get('login');
-		const password = formData.get('password');
+		const { data, errors } = await validForm(formData, loginSchema);
 
-		if (!validateLogin(login)) {
-			return fail(400, {
-				message: 'Invalid username (min 3, max 31 characters, alphanumeric only)'
-			});
-		}
-		if (!validatePassword(password)) {
-			return fail(400, { message: 'Invalid password (min 6, max 255 characters)' });
-		}
+		if (errors) return error(400, { message: errors.join('. ') + '.' });
 
 		const user = await db.query.user.findFirst({
-			where: (user, { eq }) => eq(user.login, login)
+			where: (user, { eq }) => eq(user.login, data.login)
 		});
 
 		if (!user) {
-			return fail(400, { message: 'Incorrect username or password' });
+			return error(400, { message: 'Incorrect username or password' });
 		}
 
-		const validPassword = await verify(user.passwordHash, password, auth.hashSetting);
+		const validPassword = await verify(user.passwordHash, data.password, auth.hashSetting);
 		if (!validPassword) {
-			return fail(400, { message: 'Incorrect username or password' });
+			return error(400, { message: 'Incorrect username or password' });
 		}
 
 		const sessionToken = auth.generateSessionToken();
@@ -49,34 +60,26 @@ export const actions: Actions = {
 	},
 	register: async (event) => {
 		const formData = await event.request.formData();
-		const email = formData.get('email');
-		const login = formData.get('login');
-		const password = passwordsEqual(formData.getAll('password'));
+		const { data, errors } = await validForm(formData, registerSchema);
 
-		if (!validateEmail(email)) {
-			return fail(400, { message: 'Invalid emial' });
-		}
-		if (!validateLogin(login)) {
-			return fail(400, { message: 'Invalid login' });
-		}
-		if (!validatePassword(password)) {
-			return fail(400, { message: 'Invalid password' });
-		}
+		if (errors) return error(400, { message: errors.join('. ') + '.' });
 
-		const passwordHash = await hash(password, auth.hashSetting);
+		console.log(data);
+
+		const passwordHash = await hash(data.password, auth.hashSetting);
 
 		try {
-			const [{ id: userId }] = await db
+			const [user] = await db
 				.insert(table.user)
-				.values({ email, login, passwordHash })
+				.values({ ...data, passwordHash })
 				.returning();
-			if (!userId) throw {};
+			if (!user) throw {};
 
 			const sessionToken = auth.generateSessionToken();
-			const session = await auth.createSession(sessionToken, userId);
+			const session = await auth.createSession(sessionToken, user.id);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch {
-			return fail(500, { message: 'An error has occurred' });
+			return error(500, { message: 'An error has occurred' });
 		}
 		return redirect(302, '/');
 	},

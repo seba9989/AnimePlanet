@@ -2,7 +2,7 @@ import { Client, EmbedBuilder, Events, GatewayIntentBits, type TextChannel } fro
 import { db } from '../db';
 import { env } from '$env/dynamic/private';
 
-export const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 if (!env.DC_BOT_TOKEN) throw new Error('DC_BOT_TOKEN is not set');
 if (!env.DC_EPISODES_CHANNEL) throw new Error('DC_EPISODES_CHANNEL is not set');
