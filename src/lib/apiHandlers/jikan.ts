@@ -13,7 +13,21 @@ export const jikanAnimeByTitle = async (title: string): Promise<TAnime[]> => {
 };
 
 export const jikanEpisodes = async (mal_animeId: number): Promise<TEpisode[]> => {
-	const resp = await (await fetch(`https://api.jikan.moe/v4/anime/${mal_animeId}/episodes`)).json();
+	const data: TEpisode[] = [];
+	let page: number = 1;
 
-	return resp.data;
+	while (true) {
+		const resp = await (
+			await fetch(`https://api.jikan.moe/v4/anime/${mal_animeId}/episodes?page=${page}`)
+		).json();
+		console.log(resp);
+		data.push(...resp.data);
+		if (!resp.pagination.has_next_page) break;
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+		page++;
+	}
+
+	console.log(data);
+
+	return data;
 };

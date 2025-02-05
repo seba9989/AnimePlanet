@@ -40,6 +40,8 @@ const linkSchema = vine
 		})
 	)
 	.parse((value) => {
+		console.log(value);
+
 		if (vine.helpers.isArray(value)) return value;
 		if (typeof value === 'string') return [value];
 		return;

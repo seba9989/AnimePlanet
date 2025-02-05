@@ -62,6 +62,8 @@ export const actions = {
 
 		if (errors) return error(400, { message: errors.join('. ') + '.' });
 
+		console.log(data);
+
 		await createLinksToEpisode(data);
 	}
 } satisfies Actions;
