@@ -11,7 +11,6 @@ import {
 	video,
 	type CreateAnime,
 	type CreateLink,
-	type Link
 } from '../schema';
 import {
 	episodeDbPrototype,

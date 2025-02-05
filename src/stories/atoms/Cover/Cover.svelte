@@ -31,6 +31,7 @@
 	.cover {
 		aspect-ratio: 1/1.5;
 		background-image: var(--bg-src);
+		background-position: center;
 		background-size: cover;
 	}
 	.cover:hover {
