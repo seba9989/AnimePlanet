@@ -7,12 +7,6 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 if (!env.DC_BOT_TOKEN) throw new Error('DC_BOT_TOKEN is not set');
 if (!env.DC_EPISODES_CHANNEL) throw new Error('DC_EPISODES_CHANNEL is not set');
 
-client.on(Events.ClientReady, (readyClient) => {
-	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
-
-client.login(env.DC_BOT_TOKEN);
-
 export const send = async (episodeId: string, originUrl: string) => {
 	const episode = await db.query.episode.findFirst({
 		where: (episode, { eq }) => eq(episode.id, episodeId),
@@ -36,3 +30,13 @@ export const send = async (episodeId: string, originUrl: string) => {
 	const episodesChannel = (await client.channels.fetch(env.DC_EPISODES_CHANNEL)) as TextChannel;
 	await episodesChannel.send({ embeds: [episodeEmbed] });
 };
+
+const botInit = async () => {
+	client.on(Events.ClientReady, (readyClient) => {
+		console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+	});
+
+	client.login(env.DC_BOT_TOKEN);
+};
+
+botInit();
