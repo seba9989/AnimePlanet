@@ -1,13 +1,12 @@
 import { db } from '$lib/server/db';
+import { removeLink, updateAnimeById } from '$lib/server/db/utils/creators';
+import { send } from '$lib/server/discord';
+import { extractForm, validForm } from '$lib/server/utils/formValidator';
 
 import { error } from '@sveltejs/kit';
 
 import type { Actions, PageServerLoad } from './$types';
-import { send } from '$lib/server/discord';
-import { validForm } from '$lib/server/utils/formValidator';
-import vine from '@vinejs/vine';
-import { removeLink, updateAnimeById } from '$lib/server/db/utils/creators';
-import { jsonString } from '$lib/server/utils/customVien';
+import { type } from 'arktype';
 
 export const load = (async (event) => {
 	const animeId = event.params.animeId;
@@ -32,57 +31,52 @@ export const load = (async (event) => {
 	return { anime, tags };
 }) satisfies PageServerLoad;
 
-const linkSchema = vine
-	.array(
-		jsonString({
-			episodeId: vine.string(),
-			url: vine.string().url()
-		})
-	)
-	.parse((value) => {
-		console.log(value);
-
-		if (vine.helpers.isArray(value)) return value;
-		if (typeof value === 'string') return [value];
-		return;
-	})
-	.optional();
-
-const saveSchema = vine.object({
-	title: vine.string().minLength(1),
-	tags: vine.array(vine.string()),
-	embeds: linkSchema,
-	downloads: linkSchema
+const linkType = type('string.json.parse').to({
+	episodeId: 'string',
+	url: 'string.url'
 });
 
-const removeLinkSchema = vine.object({
-	id: vine.string()
+const saveType = type({
+	title: 'string',
+	tags: 'string[]',
+	'embeds?': type(linkType, '[]'),
+	'downloads?': type(linkType, '[]')
+});
+
+const removeLinkType = type({
+	id: 'string'
 });
 
 export const actions = {
 	save: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, saveSchema);
+
+		console.log(extractForm(formData));
+
+		const { data, errors } = validForm(formData, saveType);
 
 		const animeId = event.params.animeId;
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
+		if (errors) return error(400, errors);
 
-		await updateAnimeById({ id: animeId, ...data });
+		await updateAnimeById({
+			id: animeId,
+			...data
+		});
 	},
 	removeVideo: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, removeLinkSchema);
+		const { data, errors } = validForm(formData, removeLinkType);
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
+		if (errors) return error(400, errors);
 
 		await removeLink({ type: 'video', ...data });
 	},
 	removeDownload: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, removeLinkSchema);
+		const { data, errors } = validForm(formData, removeLinkType);
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
+		if (errors) return error(400, errors);
 
 		await removeLink({ type: 'download', ...data });
 	},

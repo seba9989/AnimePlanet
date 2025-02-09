@@ -16,7 +16,8 @@ export const load = (async (event) => {
 					videos: true,
 					downloads: true
 				}
-			}
+			},
+			tags: true
 		}
 	});
 

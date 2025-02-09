@@ -34,7 +34,4 @@
 		background-position: center;
 		background-size: cover;
 	}
-	.cover:hover {
-		transform: translateZ(25px);
-	}
 </style>

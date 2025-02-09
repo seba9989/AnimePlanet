@@ -4,8 +4,8 @@ import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
-import vine from '@vinejs/vine';
 import { validForm } from '$lib/server/utils/formValidator';
+import { type } from 'arktype';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
@@ -14,30 +14,31 @@ export const load: PageServerLoad = async (event) => {
 	return {};
 };
 
-const loginSchema = vine.object({
-	login: vine.string().minLength(1).maxLength(255),
-	password: vine.string().minLength(8).maxLength(255)
+const loginType = type({
+	login: 'string',
+	password: 'string'
 });
 
-const registerSchema = vine.object({
-	email: vine.string().email(),
-	login: vine.string().minLength(1).maxLength(255),
-	password: vine
-		.string()
-		.minLength(8)
-		.maxLength(255)
-		.parse((values) => {
-			if (vine.helpers.isArray(values) && values.every((v) => v === values[0])) return values[0];
-			return;
+const registerType = type({
+	email: 'string.email < 255',
+	login: 'string < 255',
+	password: type('string', '[]')
+		.pipe.try((s, ctx) => {
+			if (s.every((v) => v === s[0])) {
+				return s[0];
+			} else {
+				return ctx.reject('passwords must be the same');
+			}
 		})
+		.to('8 < string <= 255')
 });
 
 export const actions: Actions = {
 	login: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, loginSchema);
+		const { data, errors } = await validForm(formData, loginType);
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
+		if (errors) return error(400, errors);
 
 		const user = await db.query.user.findFirst({
 			where: (user, { eq }) => eq(user.login, data.login)
@@ -60,11 +61,10 @@ export const actions: Actions = {
 	},
 	register: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, registerSchema);
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
+		const { data, errors } = validForm(formData, registerType);
 
-		console.log(data);
+		if (errors) return error(400, errors);
 
 		const passwordHash = await hash(data.password, auth.hashSetting);
 

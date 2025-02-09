@@ -19,7 +19,14 @@
 
 		<button class="btn preset-filled-surface-50-950">Zaloguj się</button>
 	</Form>
-	<Form method="post" action="?/register" class="flex flex-col justify-between gap-4">
+	<Form
+		types={{
+			password: '[array]'
+		}}
+		method="post"
+		action="?/register"
+		class="flex flex-col justify-between gap-4"
+	>
 		<h2 class="h3 text-center">Zarejestruj się</h2>
 		<div class=" flex flex-col gap-4">
 			<Input type="text" name="login" placeholder="Login" />
