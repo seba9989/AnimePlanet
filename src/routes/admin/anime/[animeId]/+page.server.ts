@@ -1,13 +1,12 @@
 import { db } from '$lib/server/db';
+import { removeLink, updateAnimeById } from '$lib/server/db/utils/creators';
+import { send } from '$lib/server/discord';
+import { extractForm, validForm } from '$lib/server/utils/formValidator';
 
 import { error } from '@sveltejs/kit';
 
 import type { Actions, PageServerLoad } from './$types';
-import { textareaToStringArray } from '$lib/utils/form';
-import { tagToAnime, video } from '$lib/server/db/schema';
-import { tagToAnimeDbPrototype } from '$lib/utils/db';
-import { eq } from 'drizzle-orm';
-import { send } from '$lib/server/discord';
+import { type } from 'arktype';
 
 export const load = (async (event) => {
 	const animeId = event.params.animeId;
@@ -32,33 +31,56 @@ export const load = (async (event) => {
 	return { anime, tags };
 }) satisfies PageServerLoad;
 
+const linkType = type('string.json.parse').to({
+	episodeId: 'string',
+	url: 'string.url'
+});
+
+const saveType = type({
+	title: 'string',
+	tags: 'string[]',
+	'embeds?': type(linkType, '[]'),
+	'downloads?': type(linkType, '[]')
+});
+
+const removeLinkType = type({
+	id: 'string'
+});
+
 export const actions = {
 	save: async (event) => {
 		const formData = await event.request.formData();
+
+		console.log(extractForm(formData));
+
+		const { data, errors } = validForm(formData, saveType);
+
 		const animeId = event.params.animeId;
-		const tags = formData.getAll('tag') as string[];
 
-		const embeds = textareaToStringArray(formData.get('embeds'));
-		const downloads = textareaToStringArray(formData.get('downloads'));
+		if (errors) return error(400, errors);
 
-		console.log(embeds);
-		console.log(downloads);
-
-		console.log(tags);
-
-		await db
-			.insert(tagToAnime)
-			.values(tagToAnimeDbPrototype({ animeId, tags }))
-			.onConflictDoNothing();
+		await updateAnimeById({
+			id: animeId,
+			...data
+		});
 	},
-	removeLink: async (event) => {
+	removeVideo: async (event) => {
 		const formData = await event.request.formData();
-		const videoId = formData.get('videoId') as string;
+		const { data, errors } = validForm(formData, removeLinkType);
 
-		console.log(videoId);
+		if (errors) return error(400, errors);
 
-		await db.delete(video).where(eq(video.id, videoId));
+		await removeLink({ type: 'video', ...data });
 	},
+	removeDownload: async (event) => {
+		const formData = await event.request.formData();
+		const { data, errors } = validForm(formData, removeLinkType);
+
+		if (errors) return error(400, errors);
+
+		await removeLink({ type: 'download', ...data });
+	},
+	// TODO: Automate sending notification
 	sendEpisode: async (event) => {
 		const formData = await event.request.formData();
 		const episodeId = formData.get('episodeId') as string;

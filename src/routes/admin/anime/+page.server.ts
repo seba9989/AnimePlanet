@@ -1,10 +1,15 @@
 import { db } from '$lib/server/db';
-import { anime, download, episode, tag, tagToAnime, video } from '$lib/server/db/schema';
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
-import { jikanAnime, jikanEpisodes } from '$lib/utils/jikan';
-import { episodeDbPrototype, tagDbPrototype, tagToAnimeDbPrototype } from '$lib/utils/db';
+import {
+	createAnimeByMalId,
+	createLinksToEpisode,
+	updateEpisodesList
+} from '$lib/server/db/utils/creators';
+import { validForm } from '$lib/server/utils/formValidator';
+import { type } from 'arktype';
 
+import { error } from '@sveltejs/kit';
+
+import type { PageServerLoad, Actions } from './$types';
 export const load = (async () => {
 	const anime = await db.query.anime.findMany({
 		with: {
@@ -16,58 +21,50 @@ export const load = (async () => {
 	return { anime };
 }) satisfies PageServerLoad;
 
+// const addAnimeSchema = vine.object({ malId: vine.number() });
+const addAnimeType = type({
+	malId: 'number'
+});
+
+const updateEpisodesListType = type({
+	malId: 'number',
+	animeId: 'string'
+});
+
+const addLinkToEpisodeType = type({
+	episodeId: 'string',
+	'videoUrl?': 'string',
+	'downloadUrl?': 'string'
+});
+
 export const actions = {
 	addAnime: async (event) => {
 		const formData = await event.request.formData();
-		const title = formData.get('title');
-		if (typeof title != 'string') return error(400);
-		const animeData = await jikanAnime(title);
+		const { data, errors } = validForm(formData, addAnimeType);
 
-		const [{ id: animeId }] = await db
-			.insert(anime)
-			.values({
-				title: animeData.title,
-				coverImageUrl: animeData.images.webp.large_image_url
-			})
-			.returning();
+		if (errors) return error(400, errors);
 
-		await db.insert(tag).values(tagDbPrototype(animeData)).onConflictDoNothing();
+		await createAnimeByMalId(data);
 
-		await db.insert(tagToAnime).values(tagToAnimeDbPrototype({ animeId, animeData }));
-
-		const episodesData = await jikanEpisodes(animeData.mal_id);
-
-		await db.insert(episode).values(episodeDbPrototype(animeId, episodesData));
 		return;
 	},
 	updateEpisodesList: async (event) => {
 		const formData = await event.request.formData();
-		const animeId = formData.get('animeId');
-		const animeTitle = formData.get('animeTitle');
+		const { data, errors } = validForm(formData, updateEpisodesListType);
 
-		if (typeof animeId != 'string') return error(400);
-		if (typeof animeTitle != 'string') return error(400);
+		if (errors) return error(400, errors);
 
-		const { mal_id } = await jikanAnime(animeTitle);
+		await updateEpisodesList(data);
 
-		const episodesData = await jikanEpisodes(mal_id);
-		await db
-			.insert(episode)
-			.values(episodeDbPrototype(animeId, episodesData))
-			.onConflictDoNothing();
 		return;
 	},
 	addLinkToEpisode: async (event) => {
 		const formData = await event.request.formData();
-		const episodeId = formData.get('episodeId');
-		const videoUrl = formData.get('videoUrl');
-		const downloadUrl = formData.get('downloadUrl');
 
-		if (typeof episodeId != 'string') return error(400);
-		if (typeof videoUrl != 'string') return error(400);
-		if (typeof downloadUrl != 'string') return error(400);
+		const { data, errors } = validForm(formData, addLinkToEpisodeType);
 
-		await db.insert(video).values({ episodeId, url: videoUrl }).onConflictDoNothing();
-		await db.insert(download).values({ episodeId, url: downloadUrl }).onConflictDoNothing();
+		if (errors) return error(400, errors);
+
+		await createLinksToEpisode(data);
 	}
 } satisfies Actions;
