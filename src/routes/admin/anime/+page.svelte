@@ -4,7 +4,7 @@
 	import { ArrowUpRight } from 'lucide-svelte';
 	import { jikanAnimeByTitle } from '$lib/apiHandlers/jikan';
 	import Form from '$components/molecules/Form/Form.svelte';
-	import Confirm from '$components/atoms/Button/Confirm/Confirm.svelte';
+	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
 
 	let { data }: { data: PageData } = $props();
 

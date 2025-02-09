@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/state';
-	import Confirm from '$components/atoms/Button/Confirm/Confirm.svelte';
+	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
 	import Cover from '$components/atoms/Cover/Cover.svelte';
 	import Textarea from '$components/atoms/Textarea/Textarea.svelte';
 	import Form from '$components/molecules/Form/Form.svelte';
@@ -43,7 +43,14 @@
 	};
 </script>
 
-<Form class="flex flex-col gap-4" action="?/save" onAll={changeMode}>
+<Form
+	class="flex flex-col gap-4"
+	action="?/save"
+	onAll={changeMode}
+	types={{
+		tags: '[array]'
+	}}
+>
 	{#if saveMode}
 		<button onclick={changeMode} type="button" class="btn ml-auto preset-filled">Edit</button>
 	{:else}
@@ -105,7 +112,6 @@
 
 		<label class="label flex flex-col">
 			<span class="label-text">Embeds</span>
-
 			<Textarea name="embeds" {episodes} disabled={saveMode} />
 		</label>
 		<label class="label flex flex-col">

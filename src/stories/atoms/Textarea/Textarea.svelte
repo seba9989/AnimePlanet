@@ -21,6 +21,8 @@
 
 <div class="input-group flex overflow-hidden font-mono">
 	<div class="select-none px-2 py-1 text-right">
+		<input checked type="checkbox" value="[array]" {name} class="hidden" />
+
 		{#each episodes as { id, episodeNumber }, index}
 			<div>{episodeNumber}</div>
 			<input

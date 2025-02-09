@@ -5,9 +5,9 @@ import {
 	updateEpisodesList
 } from '$lib/server/db/utils/creators';
 import { validForm } from '$lib/server/utils/formValidator';
+import { type } from 'arktype';
 
 import { error } from '@sveltejs/kit';
-import vine from '@vinejs/vine';
 
 import type { PageServerLoad, Actions } from './$types';
 export const load = (async () => {
@@ -21,25 +21,28 @@ export const load = (async () => {
 	return { anime };
 }) satisfies PageServerLoad;
 
-const addAnimeSchema = vine.object({ malId: vine.number() });
-
-const updateEpisodesListSchema = vine.object({
-	malId: vine.number(),
-	animeId: vine.string()
+// const addAnimeSchema = vine.object({ malId: vine.number() });
+const addAnimeType = type({
+	malId: 'number'
 });
 
-const addLinkToEpisodeSchema = vine.object({
-	episodeId: vine.string(),
-	videoUrl: vine.string().optional(),
-	downloadUrl: vine.string().optional()
+const updateEpisodesListType = type({
+	malId: 'number',
+	animeId: 'string'
+});
+
+const addLinkToEpisodeType = type({
+	episodeId: 'string',
+	'videoUrl?': 'string',
+	'downloadUrl?': 'string'
 });
 
 export const actions = {
 	addAnime: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, addAnimeSchema);
+		const { data, errors } = validForm(formData, addAnimeType);
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
+		if (errors) return error(400, errors);
 
 		await createAnimeByMalId(data);
 
@@ -47,9 +50,9 @@ export const actions = {
 	},
 	updateEpisodesList: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, updateEpisodesListSchema);
+		const { data, errors } = validForm(formData, updateEpisodesListType);
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
+		if (errors) return error(400, errors);
 
 		await updateEpisodesList(data);
 
@@ -58,11 +61,9 @@ export const actions = {
 	addLinkToEpisode: async (event) => {
 		const formData = await event.request.formData();
 
-		const { data, errors } = await validForm(formData, addLinkToEpisodeSchema);
+		const { data, errors } = validForm(formData, addLinkToEpisodeType);
 
-		if (errors) return error(400, { message: errors.join('. ') + '.' });
-
-		console.log(data);
+		if (errors) return error(400, errors);
 
 		await createLinksToEpisode(data);
 	}
