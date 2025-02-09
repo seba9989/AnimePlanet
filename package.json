@@ -18,6 +18,7 @@
 		"build-storybook": "NODE_OPTIONS=--no-experimental-require-module storybook build"
 	},
 	"devDependencies": {
+		"arktype": "^2.0.4",
 		"@chromatic-com/storybook": "^3.2.3",
 		"@eslint/compat": "^1.2.3",
 		"@paralleldrive/cuid2": "^2.2.2",
@@ -36,7 +37,6 @@
 		"@sveltejs/adapter-vercel": "^5.5.2",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
-		"@vinejs/vine": "^3.0.0",
 		"autoprefixer": "^10.4.20",
 		"discord.js": "^14.17.3",
 		"drizzle-kit": "^0.22.0",
@@ -51,7 +51,6 @@
 		"storybook": "^8.4.7",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
-		"sveltekit-superforms": "^2.23.1",
 		"tailwindcss": "^3.4.9",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0",

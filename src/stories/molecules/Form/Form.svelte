@@ -5,6 +5,7 @@
 	import type { HTMLFormAttributes } from 'svelte/elements';
 
 	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { string } from 'arktype/internal/keywords/string.ts';
 
 	type ActionFunctionArgs = Parameters<Exclude<Awaited<ReturnType<SubmitFunction>>, void>>[0];
 	type ActionFunction = (args: ActionFunctionArgs) => void;
@@ -18,6 +19,8 @@
 		onAll?: ActionFunction;
 		isLoad?: boolean;
 		isErrorHandl?: boolean;
+
+		types?: Record<string, '[array]'>;
 	};
 
 	let {
@@ -29,6 +32,7 @@
 		onAll,
 		isLoad = $bindable(false),
 		isErrorHandl,
+		types = {},
 		children,
 		...formProps
 	}: Props = $props();
@@ -77,5 +81,8 @@
 		};
 	}}
 >
+	{#each Object.entries(types) as [name, value]}
+		<input type="checkbox" checked class="hidden" {name} {value} />
+	{/each}
 	{@render children()}
 </form>

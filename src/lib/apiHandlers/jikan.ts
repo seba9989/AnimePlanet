@@ -20,11 +20,14 @@ export const jikanEpisodes = async (mal_animeId: number): Promise<TEpisode[]> =>
 		const resp = await (
 			await fetch(`https://api.jikan.moe/v4/anime/${mal_animeId}/episodes?page=${page}`)
 		).json();
-		console.log(resp);
 		data.push(...resp.data);
-		if (!resp.pagination.has_next_page) break;
-		await new Promise((resolve) => setTimeout(resolve, 1000));
-		page++;
+
+		if (resp.pagination.has_next_page) {
+			break;
+		} else {
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			page++;
+		}
 	}
 
 	console.log(data);

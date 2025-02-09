@@ -1,52 +1,79 @@
-import vine, { errors, SimpleErrorReporter } from '@vinejs/vine';
-import type { Infer, SchemaTypes } from '@vinejs/vine/types';
+import { type, type Type } from 'arktype';
+
+const typeReg = /\[(.*)\]/m;
 
 export const extractForm = (formData: FormData) => {
-	const formDataJson: { [key: string]: string | string[] } = {};
+	const formDataJson: { [key: string]: unknown } = {};
 
 	formData.forEach((value, key) => {
-		if (key in formDataJson) {
-			if (!Array.isArray(formDataJson[key])) {
-				formDataJson[key] = [formDataJson[key]];
+		let parsedValue: string | number | boolean | object | File = value;
+
+		if (typeof value === 'string') {
+			if (typeReg.test(value)) {
+				const fixedType = value.match(typeReg) as RegExpMatchArray;
+
+				switch (fixedType[1]) {
+					case 'array':
+						parsedValue = [];
+						break;
+				}
+			} else if (!(value.trim() === '')) {
+				if (!isNaN(Number(value))) {
+					parsedValue = Number(value);
+				} else if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+					parsedValue = value.toLowerCase() === 'true';
+				} else {
+					try {
+						parsedValue = JSON.parse(value);
+					} catch {
+						parsedValue = value;
+					}
+				}
 			}
+		}
+
+		if (formDataJson[key]) {
 			if (Array.isArray(formDataJson[key])) {
-				formDataJson[key].push(value.toString());
+				formDataJson[key].push(parsedValue);
+			} else {
+				formDataJson[key] = [formDataJson[key], parsedValue];
 			}
 		} else {
-			formDataJson[key] = value.toString();
+			formDataJson[key] = parsedValue;
 		}
 	});
 
 	return formDataJson;
 };
 
-type ValidForm<TSchema extends SchemaTypes> =
+type ValidForm<TParser extends Type> =
 	| {
-			data?: never;
-			errors: string[];
+			data: TParser['infer'];
+			errors?: never;
 	  }
 	| {
-			data: Infer<TSchema>;
-			errors?: never;
+			data?: never;
+			errors: {
+				message: string;
+			};
 	  };
 
-export const validForm = async <TSchema extends SchemaTypes>(
+export const validForm = <TParser extends Type>(
 	formData: FormData | object,
-	schema: TSchema
-): Promise<ValidForm<TSchema>> => {
+	parser: TParser,
+	options?: {
+		debug: boolean;
+	}
+): ValidForm<TParser> => {
 	const formDataJson = formData instanceof FormData ? extractForm(formData) : formData;
 
-	const validator = vine.compile(schema);
-	try {
-		const data = await validator.validate(formDataJson);
+	if (options?.debug) console.log(formDataJson);
 
-		return { data };
-	} catch (error) {
-		if (error instanceof errors.E_VALIDATION_ERROR) {
-			const messages = error.messages as SimpleErrorReporter['errors'];
+	const out = parser(formDataJson);
 
-			return { errors: messages.map(({ message }) => message) };
-		}
-		throw error;
+	if (out instanceof type.errors) {
+		return { errors: { message: out.summary } };
+	} else {
+		return { data: out };
 	}
 };
