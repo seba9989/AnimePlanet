@@ -1,38 +1,71 @@
-# sv
+# AnimePlanet
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+![AnimePlanet Logo](https://your-logo-url.com/logo.png)  
+**Otwarty projekt strony internetowej dla fanów anime, stworzony z wykorzystaniem SvelteKit, Tailwind CSS i nowoczesnych technologii backendowych.**
 
-## Creating a project
+## 📌 Opis projektu
+AnimePlanet to platforma dla miłośników anime, umożliwiająca przeglądanie informacji o seriach, odcinkach oraz interakcję z innymi użytkownikami. Aktualnie strona pozwala jedynie na oglądanie anime, jednak w przyszłości planowane są funkcje takie jak:
+- Możliwość dodawania komentarzy,
+- Tworzenie grup tłumaczących anime,
+- Zarządzanie własnym kontem.
 
-If you're seeing this, you've probably already done this step. Congrats!
+Projekt jest rozwijany jako open-source, a jego głównym celem jest dostarczenie intuicyjnego i estetycznego interfejsu z wysoką wydajnością.
 
-```bash
-# create a new project in the current directory
-npx sv create
+## 🚀 Technologie
+- **Frontend:** [SvelteKit](https://kit.svelte.dev/), [Tailwind CSS](https://tailwindcss.com/)
+- **Backend:** SvelteKit, Drizzle, SQLite(Turso)
+- **Autoryzacja:** Tymczasowo hash hasła
+- **Hosting:** Render
 
-# create a new project in my-app
-npx sv create my-app
+## 🔧 Instalacja
+Aby uruchomić projekt lokalnie, wykonaj następujące kroki:
+
+### 1️⃣ Klonowanie repozytorium
+```sh
+git clone https://github.com/your-username/animeplanet.git
+cd animeplanet
 ```
 
-## Developing
+### 2️⃣ Instalacja zależności
+```sh
+npm install
+```
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### 3️⃣ Konfiguracja środowiska
+Utwórz plik `.env` na podstawie `.env.example` i uzupełnij niezbędne dane:
+```
+DATABASE_URL=your-database-url
+DATABASE_AUTH_TOKEN=your-database-token
 
-```bash
+# DC Bot Config
+DC_BOT_TOKEN=your-dc-bot-token
+DC_EPISODES_CHANNEL=your-dc-channel-id
+```
+
+### 4️⃣ Uruchomienie aplikacji
+```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
+Aplikacja będzie dostępna pod adresem `http://localhost:5173`.
 
-## Building
+## 💡 Wkład w projekt
+Chętnie przyjmujemy kontrybucje! Jeśli chcesz pomóc w rozwoju AnimePlanet, oto jak możesz się zaangażować:
+- Zgłaszanie błędów (issues)
+- Propozycje nowych funkcji
+- Poprawki i optymalizacja kodu
+- Wsparcie w projektowaniu UI/UX
 
-To create a production version of your app:
+### Jak rozpocząć kontrybucję?
+1. Forkuj repozytorium.
+2. Stwórz nowy branch.
+3. Wprowadź zmiany i przetestuj je.
+4. Wyślij Pull Requesta.
 
-```bash
-npm run build
-```
+## 📄 Licencja
+Projekt jest dostępny na licencji **MIT** – możesz go dowolnie używać i rozwijać.
 
-You can preview the production build with `npm run preview`.
+## 🌟 Kontakt
+Jeśli masz pytania lub chcesz się skontaktować z twórcami, napisz do mnie na DC **seba9989** lub otwórz issue na GitHubie.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+---
+Dziękujemy za wsparcie i zainteresowanie AnimePlanet! 🎌
