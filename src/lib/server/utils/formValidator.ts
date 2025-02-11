@@ -65,13 +65,13 @@ type ValidForm<TParser extends Type> =
 export const validForm = <TParser extends Type>(
 	formData: FormData | object,
 	parser: TParser,
-	options?: {
-		debug: boolean;
+	options = {
+		debug: false
 	}
 ): ValidForm<TParser> => {
 	const formDataJson = formData instanceof FormData ? extractForm(formData) : formData;
 
-	if (options?.debug) console.log(formDataJson);
+	if (options.debug) console.log(formDataJson);
 
 	const out = parser(formDataJson);
 

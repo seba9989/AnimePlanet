@@ -31,7 +31,7 @@ export const load = (async (event) => {
 	return { anime, tags };
 }) satisfies PageServerLoad;
 
-const linkType = type('string.json.parse').to({
+const linkType = type({
 	episodeId: 'string',
 	url: 'string.url'
 });
