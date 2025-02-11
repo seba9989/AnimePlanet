@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
 import { removeLink, updateAnimeById } from '$lib/server/db/utils/creators';
 import { send } from '$lib/server/discord';
-import { extractForm, validForm } from '$lib/server/utils/formValidator';
+import { validForm } from '$lib/server/utils/formValidator';
 
 import { error } from '@sveltejs/kit';
 
@@ -39,8 +39,8 @@ const linkType = type('string.json.parse').to({
 const saveType = type({
 	title: 'string',
 	tags: 'string[]',
-	'embeds?': type(linkType, '[]'),
-	'downloads?': type(linkType, '[]')
+	embeds: type(linkType, '[]').or('undefined'),
+	downloads: type(linkType, '[]').or('undefined')
 });
 
 const removeLinkType = type({
@@ -50,8 +50,6 @@ const removeLinkType = type({
 export const actions = {
 	save: async (event) => {
 		const formData = await event.request.formData();
-
-		console.log(extractForm(formData));
 
 		const { data, errors } = validForm(formData, saveType);
 
