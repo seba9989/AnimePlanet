@@ -6,7 +6,7 @@ export const extractForm = (formData: FormData) => {
 	const formDataJson: { [key: string]: unknown } = {};
 
 	formData.forEach((value, key) => {
-		let parsedValue: string | number | boolean | object | File = value;
+		let parsedValue: string | number | boolean | object | File | undefined = value;
 
 		if (typeof value === 'string') {
 			if (typeReg.test(value)) {
@@ -14,7 +14,7 @@ export const extractForm = (formData: FormData) => {
 
 				switch (fixedType[1]) {
 					case 'array':
-						parsedValue = [];
+						parsedValue = undefined;
 						break;
 				}
 			} else if (!(value.trim() === '')) {
@@ -32,11 +32,15 @@ export const extractForm = (formData: FormData) => {
 			}
 		}
 
-		if (formDataJson[key]) {
+		const keys = new Set(Object.keys(formDataJson));
+
+		if (keys.has(key)) {
 			if (Array.isArray(formDataJson[key])) {
-				formDataJson[key].push(parsedValue);
-			} else {
+				formDataJson[key] = [...formDataJson[key], parsedValue];
+			} else if (formDataJson[key]) {
 				formDataJson[key] = [formDataJson[key], parsedValue];
+			} else {
+				formDataJson[key] = [parsedValue];
 			}
 		} else {
 			formDataJson[key] = parsedValue;
