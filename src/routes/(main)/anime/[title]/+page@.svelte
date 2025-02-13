@@ -23,6 +23,8 @@
 		episodes: `${episodes.length} / ${malData?.episodes ?? '?'}`,
 		status: malData?.status ?? ''
 	};
+
+	console.log(page.params.title);
 </script>
 
 {#snippet Title(visible = true)}
@@ -91,7 +93,7 @@
 	<div class="grid gap-5 grid-grow-52">
 		{#each episodes as { episodeNumber, title }}
 			<a
-				href="{page.params.title}/{episodeNumber}"
+				href="/anime/{page.params.title}/{episodeNumber}"
 				class="flex h-20 overflow-hidden preset-filled-surface-50-950"
 			>
 				<div class="h2 flex aspect-square items-center justify-center bg-primary-800 font-bold">
