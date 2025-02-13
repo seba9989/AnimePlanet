@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Logo from '$components/atoms/Logo/Logo.svelte';
-	import Input from '$components/atoms/Input/Input.svelte';
+	import Search from '$components/atoms/Input/Search/Search.svelte';
 	import Navbar from '$components/molecules/Navbar/Navbar.svelte';
 	import { Modal } from '@skeletonlabs/skeleton-svelte';
 	import { Menu, X } from 'lucide-svelte';
@@ -33,17 +33,26 @@
 					<X />
 				</button>
 			</header>
-			<Input
+			<Search
 				wrapperClass="w-full max-w-2xl"
-				type="search"
 				placeholder="Co chcesz dziś obejrzeć?"
-				onclick={drawerClose}
+				setQueryParam={{
+					name: "title",
+					pathname: '/anime'
+				}}
 			/>
 			<Navbar onclick={drawerClose} />
 		{/snippet}
 	</Modal>
 	<div class="hidden md:contents">
-		<Input wrapperClass="w-full max-w-2xl" type="search" placeholder="Co chcesz dziś obejrzeć?" />
+		<Search
+			wrapperClass="w-full max-w-2xl"
+			placeholder="Co chcesz dziś obejrzeć?"
+			setQueryParam={{
+				name: "title",
+				pathname: '/anime'
+			}}
+		/>
 		<Navbar />
 	</div>
 </header>

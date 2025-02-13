@@ -1,9 +1,12 @@
 import MiniSearch from 'minisearch';
-import type { Anime, TagsInAnime } from './server/db/schema';
+import type { Anime, TagInAnime } from './server/db/schema';
+import type { Prettify } from './types/pretty';
 
-interface AnimeWithTags extends Anime {
-	tags: TagsInAnime[];
-}
+type AnimeWithTags = Prettify<
+	Anime & {
+		tags?: TagInAnime[];
+	}
+>;
 
 let animeSearch: MiniSearch;
 let anime: AnimeWithTags[];
@@ -18,12 +21,15 @@ export function createAnimeIndex(data: AnimeWithTags[]) {
 	});
 
 	data.forEach((anime, index) => {
-		const tags = anime.tags.map(({ tag }) => tag);
+		const tags = anime.tags?.map(({ tag }) => tag) ?? [];
 		animeSearch.add({ index, title: anime.title, tags });
 	});
 }
 
-export function searchAnimeIndex(searchTitle: string | null, tags: string[] | string = []) {
+export function searchAnimeIndex<T extends AnimeWithTags>(
+	searchTitle: string | null,
+	tags: string[] | string = []
+): T[] {
 	if (searchTitle == '') searchTitle = null;
 	if (tags == '' || typeof tags == 'string') tags = [];
 	const searchTags = new Set(tags);
@@ -37,7 +43,7 @@ export function searchAnimeIndex(searchTitle: string | null, tags: string[] | st
 		}
 	});
 
-	if (!results) return;
+	if (!results) return [];
 
-	return results.map(({ id }) => anime[id]);
+	return results.map(({ id }) => anime[id]) as T[];
 }

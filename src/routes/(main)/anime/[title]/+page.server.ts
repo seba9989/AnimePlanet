@@ -5,17 +5,13 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load = (async (event) => {
-	const animeId = event.params.id;
+	const animeTitle = event.params.title;
 
 	const anime = await db.query.anime.findFirst({
-		where: (anime, { eq }) => eq(anime.id, animeId),
+		where: (anime, { eq }) => eq(anime.title, animeTitle),
 		with: {
 			episodes: {
 				orderBy: (episode, { asc }) => [asc(episode.episodeNumber)],
-				with: {
-					videos: true,
-					downloads: true
-				}
 			},
 			tags: true
 		}

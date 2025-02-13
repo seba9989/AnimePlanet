@@ -1,5 +1,4 @@
 <script>
-	import Cover from '$components/atoms/Cover/Cover.svelte';
 	import AnimeList from '$components/organisms/AnimeList/AnimeList.svelte';
 
 	let { data } = $props();

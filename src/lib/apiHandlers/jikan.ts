@@ -3,8 +3,6 @@ import type { TAnime, TEpisode } from './jikan.d';
 export const jikanAnimeById = async (id: number): Promise<TAnime> => {
 	const resp = await (await fetch(`https://api.jikan.moe/v4/anime/${id}`)).json();
 
-	console.log(resp.data);
-
 	return resp.data;
 };
 
@@ -22,7 +20,6 @@ export const jikanEpisodes = async (mal_animeId: number): Promise<TEpisode[]> =>
 		const resp = await (
 			await fetch(`https://api.jikan.moe/v4/anime/${mal_animeId}/episodes?page=${page}`)
 		).json();
-
 
 		data.push(...resp.data);
 

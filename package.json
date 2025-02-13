@@ -11,14 +11,13 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"db:push": "drizzle-kit push",
-		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit generate && bun run ./src/lib/server/db/push.ts",
+		"db:migrate": "drizzle-kit migrate ",
 		"db:studio": "drizzle-kit studio",
 		"storybook": "NODE_OPTIONS=--no-experimental-require-module storybook dev -p 6006",
 		"build-storybook": "NODE_OPTIONS=--no-experimental-require-module storybook build"
 	},
 	"devDependencies": {
-		"arktype": "^2.0.4",
 		"@chromatic-com/storybook": "^3.2.3",
 		"@eslint/compat": "^1.2.3",
 		"@paralleldrive/cuid2": "^2.2.2",
@@ -37,6 +36,9 @@
 		"@sveltejs/adapter-vercel": "^5.5.2",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
+		"@types/bun": "latest",
+		"@types/node": "^22.13.1",
+		"arktype": "^2.0.4",
 		"autoprefixer": "^10.4.20",
 		"discord.js": "^14.17.3",
 		"drizzle-kit": "^0.22.0",
@@ -70,5 +72,6 @@
 		"minisearch": "^7.1.1",
 		"svelte-motion": "^0.12.2",
 		"tailwind-merge": "^2.6.0"
-	}
+	},
+	"module": "index.ts"
 }
