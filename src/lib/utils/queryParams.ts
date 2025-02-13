@@ -1,8 +1,14 @@
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 
-export const setQueryParam = (name: string, value: string) => {
+export type SetQueryParamConfig = { name: string; value: string; pathname?: string };
+
+export const setQueryParam = ({
+	name,
+	value,
+	pathname = page.url.pathname
+}: SetQueryParamConfig) => {
 	page.url.searchParams.set(name, value);
-	goto(`/anime?${page.url.searchParams.toString()}`, { keepFocus: true });
+	goto(`${pathname}?${page.url.searchParams.toString()}`, { keepFocus: true });
 	return;
 };

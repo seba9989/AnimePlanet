@@ -12,6 +12,7 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 export const load = (async () => {
 	const anime = await db.query.anime.findMany({
+		orderBy: (anime, { asc }) => [asc(anime.title)],
 		with: {
 			episodes: {
 				orderBy: (episode, { desc }) => [desc(episode.episodeNumber)]
@@ -43,6 +44,8 @@ export const actions = {
 		const { data, errors } = validForm(formData, addAnimeType);
 
 		if (errors) return error(400, errors);
+
+		console.log(data);
 
 		await createAnimeByMalId(data);
 

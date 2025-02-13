@@ -5,10 +5,14 @@
 	import { jikanAnimeByTitle } from '$lib/apiHandlers/jikan';
 	import Form from '$components/molecules/Form/Form.svelte';
 	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
+	import Search from '$components/atoms/Input/Search/Search.svelte';
+	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
+	import { page } from '$app/state';
 
 	let { data }: { data: PageData } = $props();
 
-	let { anime } = $derived(data);
+	// let realAnime =
+	let anime = $state(data.anime);
 
 	let title = $state('');
 
@@ -17,9 +21,24 @@
 	function modalClose() {
 		openState = false;
 	}
+	$effect(() => {
+		createAnimeIndex(data.anime);
+	});
+	$effect(() => {
+		const title = page.url.searchParams.get('title');
+		const tags = page.url.searchParams.get('tags')?.split(',');
+		anime = searchAnimeIndex(title, tags) ?? [];
+	});
 </script>
 
-<div class="ml-auto">
+<div class="flex items-center justify-between">
+	<Search
+		wrapperClass="w-full max-w-2xl"
+		placeholder="Szukany tytuł"
+		setQueryParam={{
+			name: 'title'
+		}}
+	/>
 	<Modal
 		bind:open={openState}
 		triggerBase="btn preset-tonal"

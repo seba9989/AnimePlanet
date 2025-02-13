@@ -10,7 +10,7 @@ import {
 	tagToAnime,
 	video,
 	type CreateAnime,
-	type CreateLink,
+	type CreateLink
 } from '../schema';
 import {
 	episodeDbPrototype,

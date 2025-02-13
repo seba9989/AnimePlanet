@@ -1,34 +1,34 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import type { Prettify } from '$lib/types/pretty';
 	import { cn } from '$lib/utils/cn';
-	import { setQueryParam } from '$lib/utils/queryParams';
+	import { setQueryParam, type SetQueryParamConfig } from '$lib/utils/queryParams';
 	import { Search } from 'lucide-svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLInputAttributes {
+	type Props = HTMLInputAttributes & {
 		wrapperClass?: string;
-	}
+		setQueryParam: Prettify<Omit<SetQueryParamConfig, 'value'>>;
+	};
 
-	let { wrapperClass, onclick, ...props }: Props = $props();
-	let title: string = $state('');
+	let { wrapperClass, onclick, setQueryParam: setQueryParamConfig, ...props }: Props = $props();
+	let value: string = $state('');
 
 	$effect(() => {
-		title = page.url.searchParams.get('title') ?? '';
+		if (!setQueryParamConfig.pathname || page.url.pathname === setQueryParamConfig.pathname) {
+			value = page.url.searchParams.get(setQueryParamConfig.name) ?? '';
+		} else {
+			value = '';
+		}
 	});
 </script>
 
 <div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', wrapperClass)}>
-	<input
-		{...props}
-		bind:value={title}
-		placeholder="Już wkrótce..."
-		onkeyup={() => setQueryParam('title', title)}
-	/>
+	<input {...props} bind:value onkeyup={() => setQueryParam({ ...setQueryParamConfig, value })} />
 
 	<button
 		onclick={() => {
-			setQueryParam('title', title);
+			setQueryParam({ ...setQueryParamConfig, value });
 			// @ts-expect-error
 			onclick();
 		}}
