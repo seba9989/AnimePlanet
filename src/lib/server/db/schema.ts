@@ -41,14 +41,41 @@ export type User = typeof user.$inferSelect;
 ///////////
 // Anime //
 ///////////
-export const anime = sqliteTable('anime', {
-	id: uuid('id').primaryKey(),
-	title: text('title').unique().notNull(),
-	releaseDate: integer('release_date', { mode: 'timestamp' }).notNull(),
-	coverImageUrl: text('cover_image_url').notNull(),
-	nsfw: integer('nsfw', { mode: 'boolean' }).default(false),
-	malId: integer('mal_id')
-});
+
+
+export const load = async ({ params, fetch }) => {
+
+	const formattedTitle = decodeURIComponent(params.title).replace(/-/g, ' ');
+
+	const query = `
+    query {
+      Media(search: "${formattedTitle}", type: ANIME) {
+        title {
+          romaji
+          english
+          native
+        }
+        coverImage {
+          large
+        }
+        bannerImage
+      }
+    }
+  `;
+
+	const res = await fetch('https://graphql.anilist.co', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ query })
+	});
+
+	const { data } = await res.json();
+
+	return {
+		anime: data.Media
+	};
+};
+
 export const animeRelations = relations(anime, ({ many }) => ({
 	episodes: many(episode),
 	tags: many(tagToAnime)
