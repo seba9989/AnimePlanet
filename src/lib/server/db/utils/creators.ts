@@ -23,7 +23,7 @@ type CreateAnimeByMalId = { malId: number };
 
 export const createAnimeByMalId = async ({ malId }: CreateAnimeByMalId) => {
 	const animeData = await jikanAnimeById(malId);
-	const episodesData = await jikanEpisodes(animeData.mal_id);
+	const episodesData = await jikanEpisodes(malId);
 
 	db.transaction(async (db) => {
 		const animePrototype: CreateAnime = {
