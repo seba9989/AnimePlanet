@@ -18,7 +18,7 @@
 		season:
 			malData?.season && malData?.year
 				? `${malData?.season ?? ''} ${malData?.year ?? ''}`
-				: (new Date(malData?.aired.from ?? '').getFullYear() as unknown as string),
+				: String(new Date(malData?.aired.from ?? '').getFullYear()),
 		duration: malData?.duration ?? '',
 		episodes: `${episodes.length} / ${malData?.episodes ?? '?'}`,
 		status: malData?.status ?? ''
@@ -49,7 +49,10 @@
 		</div>
 		<div
 			class="bg-cover bg-no-repeat"
-			style="background-image: url({coverImageUrl}); background-position: 0% 10%;"
+			style="
+			background-image: url({coverImageUrl}); 
+			background-position: 0% 20%;
+			"
 		>
 			<div
 				class="h-full bg-gradient-radial from-transparent to-black backdrop-blur-sm backdrop-brightness-90"

@@ -68,10 +68,12 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"clsx": "^2.1.1",
 		"drizzle-orm": "^0.33.0",
+		"gql.tada": "^1.8.10",
 		"lucide-svelte": "^0.469.0",
 		"minisearch": "^7.1.1",
 		"svelte-motion": "^0.12.2",
-		"tailwind-merge": "^2.6.0"
+		"tailwind-merge": "^2.6.0",
+		"urql": "^4.2.1"
 	},
 	"module": "index.ts"
 }

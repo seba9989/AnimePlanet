@@ -1,15 +1,16 @@
+import { animeCoverById } from './aniList';
 import type { TAnime, TEpisode } from './jikan.d';
 
 export const jikanAnimeById = async (id: number): Promise<TAnime> => {
-	const resp = await (await fetch(`https://api.jikan.moe/v4/anime/${id}`)).json();
+	const { data }: { data: TAnime } = await (
+		await fetch(`https://api.jikan.moe/v4/anime/${id}`)
+	).json();
 
-	return resp.data;
-};
+	const animeCover = await animeCoverById(id);
 
-export const jikanAnimeByTitle = async (title: string): Promise<TAnime[]> => {
-	const resp = await (await fetch(`https://api.jikan.moe/v4/anime?q=${title}`)).json();
+	if (animeCover) data.images.webp.large_image_url = animeCover;
 
-	return resp.data;
+	return data;
 };
 
 export const jikanEpisodes = async (mal_animeId: number): Promise<TEpisode[]> => {
