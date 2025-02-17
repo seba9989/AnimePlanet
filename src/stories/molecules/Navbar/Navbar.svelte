@@ -14,7 +14,7 @@
 		<a href="https://www.instagram.com/animenistarofkirito/">
 			<Instagram />
 		</a>
-		<a href="https://discord.gg/dsxrjPBJ54">
+		<a href="https://discord.gg/jCzzgkSTCU">
 			<!-- Discord Icon -->
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 				<path
