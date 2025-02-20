@@ -51,7 +51,7 @@
 			class="bg-cover bg-no-repeat"
 			style="
 			background-image: url({coverImageUrl}); 
-			background-position: 0% 20%;
+			background-position: 0% 50%;
 			"
 		>
 			<div
