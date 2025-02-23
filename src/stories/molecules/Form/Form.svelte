@@ -5,7 +5,6 @@
 	import type { HTMLFormAttributes } from 'svelte/elements';
 
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import type { string } from 'arktype/internal/keywords/string.ts';
 
 	type ActionFunctionArgs = Parameters<Exclude<Awaited<ReturnType<SubmitFunction>>, void>>[0];
 	type ActionFunction = (args: ActionFunctionArgs) => void;
@@ -19,12 +18,13 @@
 		onAll?: ActionFunction;
 		isLoad?: boolean;
 		isErrorHandl?: boolean;
+		isReset?: boolean;
 
 		types?: Record<string, '[array]'>;
 	};
 
 	let {
-		onsubmit,
+		onsubmit: onSubmit,
 		onSuccess,
 		onError,
 		onFailure,
@@ -32,6 +32,8 @@
 		onAll,
 		isLoad = $bindable(false),
 		isErrorHandl,
+		isReset = true,
+
 		types = {},
 		children,
 		...formProps
@@ -39,9 +41,9 @@
 
 	const toast = getContext<ToastContext>('toast');
 
-	onsubmit = (event) => {
+	const onsubmit: HTMLFormAttributes['onsubmit'] = (event) => {
 		isLoad = true;
-		onsubmit?.(event);
+		onSubmit?.(event);
 	};
 
 	setContext('form', {
@@ -77,12 +79,12 @@
 
 			isLoad = false;
 			if (!isErrorHandl && result.type == 'error') return;
-			update();
+			update({ reset: isReset });
 		};
 	}}
 >
 	{#each Object.entries(types) as [name, value]}
-		<input type="checkbox" checked class="hidden" {name} {value} />
+		<input type="checkbox" defaultChecked class="hidden" {name} {value} />
 	{/each}
 	{@render children()}
 </form>

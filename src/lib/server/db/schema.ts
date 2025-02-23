@@ -16,7 +16,7 @@ const uuid = (name: string) =>
 
 export const user = sqliteTable('user', {
 	id: uuid('id').primaryKey(),
-	age: integer('age'),
+	age: integer('age', { mode: 'timestamp' }),
 	email: text('email').unique().notNull(),
 	login: text('login').unique().notNull(),
 	passwordHash: text('password_hash').notNull(),

@@ -13,7 +13,6 @@
 
 	let { data }: { data: PageData } = $props();
 
-	// let realAnime =
 	let anime = $state(data.anime);
 
 	let title = $state('');
