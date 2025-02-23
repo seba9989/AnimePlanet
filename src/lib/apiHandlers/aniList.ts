@@ -29,6 +29,14 @@ const AnimeCoverById = graphql(`
 	}
 `);
 
+const AnimeIsNSFW = graphql(`
+	query IsNSFW($idMal: Int) {
+		Media(type: ANIME, idMal: $idMal) {
+			isAdult
+		}
+	}
+`);
+
 export const animeListByTitle = async (title: string) => {
 	const { data, error } = await aniList.query(SearchAnimeByTitle, {
 		title: title !== '' ? title : undefined
@@ -47,4 +55,14 @@ export const animeCoverById = async (idMal: number) => {
 	if (error) throw new Error(error.message);
 
 	return data?.Media?.coverImage?.extraLarge;
+};
+
+export const animeIsNSFW = async (idMal: number) => {
+	const { data, error } = await aniList.query(AnimeIsNSFW, {
+		idMal
+	});
+
+	if (error) throw new Error(error.message);
+
+	return !!data?.Media?.isAdult;
 };

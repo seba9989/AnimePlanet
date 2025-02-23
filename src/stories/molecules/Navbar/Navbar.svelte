@@ -42,4 +42,8 @@
 			<a href="/auth" class="btn w-full preset-filled"> Zaloguj się </a>
 		{/if}
 	</button>
+
+	{#if page.data.user?.admin}
+		<a href="/admin" class="btn preset-tonal">Admin Panel</a>
+	{/if}
 </nav>

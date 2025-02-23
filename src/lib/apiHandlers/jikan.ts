@@ -1,16 +1,17 @@
-import { animeCoverById } from './aniList';
+import { animeCoverById, animeIsNSFW } from './aniList';
 import type { TAnime, TEpisode } from './jikan.d';
 
-export const jikanAnimeById = async (id: number): Promise<TAnime> => {
+export const jikanAnimeById = async (id: number): Promise<TAnime & { nsfw: boolean }> => {
 	const { data }: { data: TAnime } = await (
 		await fetch(`https://api.jikan.moe/v4/anime/${id}`)
 	).json();
 
 	const animeCover = await animeCoverById(id);
+	const isNSFW = await animeIsNSFW(id);
 
 	if (animeCover) data.images.webp.large_image_url = animeCover;
 
-	return data;
+	return { ...data, nsfw: isNSFW };
 };
 
 export const jikanEpisodes = async (mal_animeId: number): Promise<TEpisode[]> => {

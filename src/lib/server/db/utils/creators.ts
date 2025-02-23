@@ -10,7 +10,9 @@ import {
 	tagToAnime,
 	video,
 	type CreateAnime,
-	type CreateLink
+	type CreateEpisode,
+	type CreateLink,
+	type Episode
 } from '../schema';
 import {
 	episodeDbPrototype,
@@ -30,6 +32,7 @@ export const createAnimeByMalId = async ({ malId }: CreateAnimeByMalId) => {
 			title: animeData.title,
 			releaseDate: new Date(animeData.aired.from),
 			coverImageUrl: animeData.images.webp.large_image_url,
+			nsfw: animeData.nsfw,
 			malId: animeData.mal_id
 		};
 
@@ -144,4 +147,16 @@ export const removeLink = async ({ type, id }: RemoveLink) => {
 			await db.delete(download).where(eq(download.id, id));
 			break;
 	}
+};
+
+export const updateEpisode = async ({ id, title, episodeNumber }: Omit<Episode, 'animeId'>) => {
+	await db.update(episode).set({ title, episodeNumber }).where(eq(episode.id, id));
+};
+
+export const removeEpisode = async ({ id }: Pick<Episode, 'id'>) => {
+	await db.delete(episode).where(eq(episode.id, id));
+};
+
+export const createEpisode = async (episodeData: CreateEpisode) => {
+	await db.insert(episode).values(episodeData);
 };
