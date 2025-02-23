@@ -1,5 +1,4 @@
-import { db } from '$lib/server/db';
-import { removeLink, updateAnimeById } from '$lib/server/db/utils/creators';
+import { createEpisode, removeEpisode, updateAnimeById } from '$lib/server/db/utils/creators';
 import { send } from '$lib/server/discord';
 import { validForm } from '$lib/server/utils/formValidator';
 
@@ -7,6 +6,7 @@ import { error } from '@sveltejs/kit';
 
 import type { Actions, PageServerLoad } from './$types';
 import { type } from 'arktype';
+import { db } from '$lib/server/db';
 
 export const load = (async (event) => {
 	const animeId = event.params.animeId;
@@ -15,11 +15,7 @@ export const load = (async (event) => {
 		where: (anime, { eq }) => eq(anime.id, animeId),
 		with: {
 			episodes: {
-				orderBy: (episode, { asc }) => [asc(episode.episodeNumber)],
-				with: {
-					videos: true,
-					downloads: true
-				}
+				orderBy: (episode, { asc }) => [asc(episode.episodeNumber)]
 			},
 			tags: true
 		}
@@ -43,14 +39,18 @@ const saveType = type({
 	downloads: type(linkType, '[]').or('undefined')
 });
 
-const removeLinkType = type({
+const removeEpisodeType = type({
 	id: 'string'
+});
+
+const createEpisodeType = type({
+	episodeNumber: 'number',
+	title: 'string'
 });
 
 export const actions = {
 	save: async (event) => {
 		const formData = await event.request.formData();
-
 		const { data, errors } = validForm(formData, saveType);
 
 		const animeId = event.params.animeId;
@@ -62,21 +62,21 @@ export const actions = {
 			...data
 		});
 	},
-	removeVideo: async (event) => {
+	removeEpisode: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = validForm(formData, removeLinkType);
+		const { data, errors } = validForm(formData, removeEpisodeType);
 
 		if (errors) return error(400, errors);
 
-		await removeLink({ type: 'video', ...data });
+		await removeEpisode(data);
 	},
-	removeDownload: async (event) => {
+	createEpisode: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = validForm(formData, removeLinkType);
+		const { data, errors } = validForm(formData, createEpisodeType);
 
 		if (errors) return error(400, errors);
 
-		await removeLink({ type: 'download', ...data });
+		await createEpisode({ animeId: event.params.animeId, ...data });
 	},
 	// TODO: Automate sending notification
 	sendEpisode: async (event) => {

@@ -1,17 +1,18 @@
 <script lang="ts">
-	import { Accordion, Modal } from '@skeletonlabs/skeleton-svelte';
 	import type { PageData } from './$types';
-	import { ArrowUpRight } from 'lucide-svelte';
-	import { jikanAnimeByTitle } from '$lib/apiHandlers/jikan';
+	import { page } from '$app/state';
+
 	import Form from '$components/molecules/Form/Form.svelte';
 	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
 	import Search from '$components/atoms/Input/Search/Search.svelte';
+	import { Accordion, Modal } from '@skeletonlabs/skeleton-svelte';
+	import { ArrowUpRight } from 'lucide-svelte';
+
 	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
-	import { page } from '$app/state';
+	import { animeListByTitle } from '$lib/apiHandlers/aniList';
 
 	let { data }: { data: PageData } = $props();
 
-	// let realAnime =
 	let anime = $state(data.anime);
 
 	let title = $state('');
@@ -60,14 +61,14 @@
 					/>
 				</div>
 				<select class="select overflow-auto" name="malId" size="4" value="1">
-					{#await jikanAnimeByTitle(title)}
+					{#await animeListByTitle(title)}
 						{#each new Array(4) as _}
 							<option class="">&nbsp;</option>
 						{/each}
 					{:then anime}
 						{#if anime.length > 0}
 							{#each anime as anime}
-								<option value={anime.mal_id}>{anime.title}</option>
+								<option value={anime?.idMal}>{anime?.title?.romaji}</option>
 							{/each}
 						{:else}
 							{#each new Array(4) as _}

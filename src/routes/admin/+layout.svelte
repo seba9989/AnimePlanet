@@ -2,4 +2,6 @@
 	let { children } = $props();
 </script>
 
-{@render children()}
+<div class="grid content-start p-2">
+	{@render children()}
+</div>
