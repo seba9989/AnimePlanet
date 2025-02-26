@@ -48,6 +48,10 @@ const createEpisodeType = type({
 	title: 'string'
 });
 
+const sendEpisodeType = type({
+	episodeId: 'string'
+});
+
 export const actions = {
 	save: async (event) => {
 		const formData = await event.request.formData();
@@ -81,7 +85,10 @@ export const actions = {
 	// TODO: Automate sending notification
 	sendEpisode: async (event) => {
 		const formData = await event.request.formData();
-		const episodeId = formData.get('episodeId') as string;
-		send(episodeId, event.url.origin);
+		const { data, errors } = validForm(formData, sendEpisodeType);
+
+		if (errors) return error(400, errors);
+
+		await send(data.episodeId, event.url.origin);
 	}
 } satisfies Actions;
