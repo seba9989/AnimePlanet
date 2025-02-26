@@ -6,7 +6,7 @@
 	import Form from '$components/molecules/Form';
 	import type { Link } from '$lib/server/db/schema.js';
 	import { urlToHosting } from '$lib/utils/urlToHosting.js';
-	import { CircleX } from 'lucide-svelte';
+	import { CircleX, Send } from 'lucide-svelte';
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
 	import { Modal } from '@skeletonlabs/skeleton-svelte';
@@ -157,9 +157,9 @@
 	{/snippet}
 
 	<div class="table-wrap">
-		<table class="table grid grid-cols-[auto_1fr_auto_auto]">
-			<thead class="col-span-4 grid grid-cols-subgrid items-center">
-				<tr class="col-span-2 grid grid-cols-subgrid">
+		<table class="table grid grid-cols-[auto_1fr_auto_auto_auto]">
+			<thead class="col-span-5 grid grid-cols-subgrid items-center">
+				<tr class="col-span-3 grid grid-cols-subgrid">
 					<th>Np.</th>
 					<th>Title</th>
 				</tr>
@@ -171,11 +171,11 @@
 							contentClasses="w-md card w-[90%] max-w-screen-md p-4  shadow-xl bg-surface-100-900"
 							backdropClasses="backdrop-blur-sm"
 						>
-							{#snippet trigger()}Create Anime{/snippet}
+							{#snippet trigger()}Create Episode{/snippet}
 							{#snippet content()}
 								<Form action="?/createEpisode" class="space-y-4">
 									<header class="text-nowrap">
-										<h2 class="h2">Create Anime</h2>
+										<h2 class="h2">Create Episode</h2>
 									</header>
 									<div class="space-y-2">
 										<input
@@ -195,9 +195,9 @@
 					</th>
 				</tr>
 			</thead>
-			<tbody class="col-span-4 grid grid-cols-subgrid hover:[&>tr]:backdrop-brightness-75">
+			<tbody class="col-span-5 grid grid-cols-subgrid hover:[&>tr]:backdrop-brightness-75">
 				{#each episodes as episode}
-					<tr class="col-span-4 grid grid-cols-subgrid items-center">
+					<tr class="col-span-5 grid grid-cols-subgrid items-center">
 						<th>{episode.episodeNumber}</th>
 						<th>{episode.title}</th>
 						<th>
@@ -209,33 +209,23 @@
 								<button class="btn preset-tonal-error">Remove</button>
 							</Form>
 						</th>
+						<th>
+							<Form action="?/sendEpisode">
+								<input
+									class="hidden"
+									type="checkbox"
+									defaultChecked
+									name="episodeId"
+									value={episode.id}
+								/>
+								<Form.Confirm resetStyle class="btn preset-tonal">Send DC</Form.Confirm>
+							</Form>
+						</th>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
 	</div>
 </div>
-
-<!-- 
-<Accordion collapsible>
-	{#each episodes as episode}
-		<hr class="hr" />
-		<Accordion.Item value={episode.id}>
-			{#snippet lead()}
-				<form action="?/sendEpisode" method="post" use:enhance>
-					<input checked type="radio" class="hidden" value={episode.id} name="episodeId" />
-					<button class="btn preset-tonal">Send to discord</button>
-				</form>
-			{/snippet}
-			{#snippet control()}{episode.title}{/snippet}
-			{#snippet panel()}
-				<div class="flex gap-4">
-					{@render linksTable('Video', episode.videos)}
-					{@render linksTable('Download', episode.downloads)}
-				</div>
-			{/snippet}
-		</Accordion.Item>
-	{/each}
-</Accordion> -->
 
 <!-- <pre>{JSON.stringify(data.anime, null, 2)}</pre> -->
