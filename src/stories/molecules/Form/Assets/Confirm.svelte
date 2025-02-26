@@ -4,12 +4,17 @@
 	import { getContext } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 
-	const { children, class: className, ...props }: HTMLButtonAttributes = $props();
+	const {
+		children,
+		class: className,
+		resetStyle = false,
+		...props
+	}: HTMLButtonAttributes & { resetStyle?: boolean } = $props();
 
 	let form = getContext<{ isLoad: boolean }>('form');
 </script>
 
-<button type="submit" class={cn('btn preset-filled', className)} {...props}>
+<button type="submit" class={cn(!resetStyle && 'btn preset-filled', className)} {...props}>
 	{#if form.isLoad}
 		<LoaderCircle class="animate-spin" />
 	{:else}

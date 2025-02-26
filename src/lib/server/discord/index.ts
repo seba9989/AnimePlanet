@@ -1,4 +1,4 @@
-import { Client, EmbedBuilder, Events, GatewayIntentBits, type TextChannel } from 'discord.js';
+import { Client, EmbedBuilder, Events, GatewayIntentBits, TextChannel } from 'discord.js';
 import { db } from '../db';
 import { env } from '$env/dynamic/private';
 
@@ -21,13 +21,16 @@ export const send = async (episodeId: string, originUrl: string) => {
 	const episodeEmbed = new EmbedBuilder()
 		.setColor(0x0099ff)
 		.setTitle(`${episode.anime.title} ${episode.episodeNumber}`)
-		.setURL(`${originUrl}/anime/${episode.animeId}`)
+		.setURL(encodeURI(`${originUrl}/anime/${episode.anime.title}/${episode.episodeNumber}`))
 		.setDescription(`Tytuł: ${episode.title}`)
 		.setImage(episode.anime.coverImageUrl)
 		.setTimestamp()
 		.setFooter({ text: 'AnimePlanet', iconURL: `${originUrl}/favicon.png` });
 
-	const episodesChannel = (await client.channels.fetch(env.DC_EPISODES_CHANNEL)) as TextChannel;
+	const episodesChannel = await client.channels.fetch(env.DC_EPISODES_CHANNEL);
+
+	if (!(episodesChannel instanceof TextChannel)) return;
+
 	await episodesChannel.send({ embeds: [episodeEmbed] });
 };
 
