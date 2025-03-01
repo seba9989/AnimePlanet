@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getContext, setContext, type Snippet } from 'svelte';
 	import type { HTMLFormAttributes } from 'svelte/elements';
-
-	import type { SubmitFunction } from '@sveltejs/kit';
 
 	type ActionFunctionArgs = Parameters<Exclude<Awaited<ReturnType<SubmitFunction>>, void>>[0];
 	type ActionFunction = (args: ActionFunctionArgs) => void;

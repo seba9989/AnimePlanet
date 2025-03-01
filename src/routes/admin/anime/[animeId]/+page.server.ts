@@ -1,12 +1,10 @@
+import { db } from '$lib/server/db';
 import { createEpisode, removeEpisode, updateAnimeById } from '$lib/server/db/utils/creators';
 import { send } from '$lib/server/discord';
 import { validForm } from '$lib/server/utils/formValidator';
-
-import { error } from '@sveltejs/kit';
-
 import type { Actions, PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
 import { type } from 'arktype';
-import { db } from '$lib/server/db';
 
 export const load = (async (event) => {
 	const animeId = event.params.animeId;

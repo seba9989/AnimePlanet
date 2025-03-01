@@ -1,5 +1,4 @@
 import { jikanAnimeById, jikanEpisodes } from '$lib/apiHandlers/jikan';
-import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '..';
 import {
 	anime,
@@ -20,6 +19,7 @@ import {
 	tagDbPrototype,
 	tagToAnimeDbPrototype
 } from './preCreators';
+import { and, eq, inArray } from 'drizzle-orm';
 
 type CreateAnimeByMalId = { malId: number };
 

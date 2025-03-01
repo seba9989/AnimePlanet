@@ -1,10 +1,10 @@
-import MiniSearch from 'minisearch';
-import type { Anime, TagInAnime } from './server/db/schema';
+import type { Anime, TagToAnime } from './server/db/schema';
 import type { Prettify } from './types/pretty';
+import MiniSearch from 'minisearch';
 
 type AnimeWithTags = Prettify<
 	Anime & {
-		tags?: TagInAnime[];
+		tags?: TagToAnime[];
 	}
 >;
 

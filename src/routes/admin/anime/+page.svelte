@@ -1,15 +1,13 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import { page } from '$app/state';
-
-	import Form from '$components/molecules/Form/Form.svelte';
-	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
 	import Search from '$components/atoms/Input/Search/Search.svelte';
+	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
+	import Form from '$components/molecules/Form/Form.svelte';
+	import { animeListByTitle } from '$lib/apiHandlers/aniList';
+	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
+	import type { PageData } from './$types';
 	import { Accordion, Modal } from '@skeletonlabs/skeleton-svelte';
 	import { ArrowUpRight } from 'lucide-svelte';
-
-	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
-	import { animeListByTitle } from '$lib/apiHandlers/aniList';
 
 	let { data }: { data: PageData } = $props();
 

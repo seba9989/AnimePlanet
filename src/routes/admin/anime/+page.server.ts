@@ -5,11 +5,10 @@ import {
 	updateEpisodesList
 } from '$lib/server/db/utils/creators';
 import { validForm } from '$lib/server/utils/formValidator';
+import type { PageServerLoad, Actions } from './$types';
+import { error } from '@sveltejs/kit';
 import { type } from 'arktype';
 
-import { error } from '@sveltejs/kit';
-
-import type { PageServerLoad, Actions } from './$types';
 export const load = (async () => {
 	const anime = await db.query.anime.findMany({
 		orderBy: (anime, { asc }) => [asc(anime.title)],

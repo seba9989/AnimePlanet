@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Cover from '$components/atoms/Cover/Cover.svelte';
-	import type { Anime, TagInAnime } from '$lib/server/db/schema';
+	import type { Anime, TagToAnime } from '$lib/server/db/schema';
 	import { flip } from 'svelte/animate';
 	import { scale } from 'svelte/transition';
 
 	interface AnimeWithTags extends Anime {
-		tags?: TagInAnime[];
+		tags?: TagToAnime[];
 	}
 
 	let { anime }: { anime: AnimeWithTags[] } = $props();

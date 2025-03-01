@@ -1,6 +1,6 @@
 <script lang="ts">
-	import '../app.css';
 	import Header from '$components/organisms/Header/Header.svelte';
+	import '../app.css';
 	import { ToastProvider } from '@skeletonlabs/skeleton-svelte';
 
 	let { children } = $props();

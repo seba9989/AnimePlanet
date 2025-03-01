@@ -1,5 +1,5 @@
-import { Client, cacheExchange, fetchExchange } from 'urql';
 import { graphql } from 'gql.tada';
+import { Client, cacheExchange, fetchExchange } from 'urql';
 
 const aniList = new Client({
 	url: 'https://graphql.anilist.co',

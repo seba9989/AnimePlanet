@@ -1,8 +1,6 @@
 import { db } from '$lib/server/db';
-
-import { error } from '@sveltejs/kit';
-
 import type { PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
 
 export const load = (async (event) => {
 	const animeTitle = event.params.title;
@@ -11,7 +9,7 @@ export const load = (async (event) => {
 		where: (anime, { eq }) => eq(anime.title, animeTitle),
 		with: {
 			episodes: {
-				orderBy: (episode, { asc }) => [asc(episode.episodeNumber)],
+				orderBy: (episode, { asc }) => [asc(episode.episodeNumber)]
 			},
 			tags: true
 		}

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
 	import Password from './Password/Password.svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLInputAttributes {
 		wrapperClass?: string;

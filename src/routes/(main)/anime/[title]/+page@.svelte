@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import { page } from '$app/state';
+	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 

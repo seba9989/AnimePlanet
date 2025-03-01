@@ -3,7 +3,6 @@ import * as themes from '@skeletonlabs/skeleton/themes';
 import containerQueries from '@tailwindcss/container-queries';
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
-
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 

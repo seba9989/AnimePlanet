@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
 	import Cover from '$components/atoms/Cover/Cover.svelte';
 	import Textarea from '$components/atoms/Textarea/Textarea.svelte';
 	import Form from '$components/molecules/Form';
-	import type { Link } from '$lib/server/db/schema.js';
+	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
+	import type { Link } from '$lib/server/db/schema';
 	import { urlToHosting } from '$lib/utils/urlToHosting.js';
+	import { Modal } from '@skeletonlabs/skeleton-svelte';
 	import { CircleX, Send } from 'lucide-svelte';
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
-	import { Modal } from '@skeletonlabs/skeleton-svelte';
 
 	let { data } = $props();
 	let {

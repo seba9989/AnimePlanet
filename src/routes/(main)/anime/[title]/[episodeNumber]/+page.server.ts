@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
 
 export const load = (async ({ params }) => {
 	const animeTitle = params.title;
