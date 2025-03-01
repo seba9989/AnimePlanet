@@ -1,6 +1,13 @@
-import { Client, EmbedBuilder, Events, GatewayIntentBits, TextChannel } from 'discord.js';
-import { db } from '../db';
 import { env } from '$env/dynamic/private';
+import { db } from '../db';
+import {
+	Client,
+	EmbedBuilder,
+	Events,
+	GatewayIntentBits,
+	NewsChannel,
+	TextChannel
+} from 'discord.js';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -29,7 +36,8 @@ export const send = async (episodeId: string, originUrl: string) => {
 
 	const episodesChannel = await client.channels.fetch(env.DC_EPISODES_CHANNEL);
 
-	if (!(episodesChannel instanceof TextChannel)) return;
+	if (!(episodesChannel instanceof TextChannel) && !(episodesChannel instanceof NewsChannel))
+		return;
 
 	await episodesChannel.send({ embeds: [episodeEmbed] });
 };
