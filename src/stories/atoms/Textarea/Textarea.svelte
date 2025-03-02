@@ -21,15 +21,13 @@
 
 <div class="input-group flex overflow-hidden font-mono">
 	<div class="select-none px-2 py-1 text-right">
-		<input checked type="checkbox" value="[array]" {name} class="hidden" />
-
 		{#each episodes as { id, episodeNumber }, index}
 			<div>{episodeNumber}</div>
 			<input
 				class="hidden"
 				type="checkbox"
-				checked={!!textLines[index]}
-				value={JSON.stringify({
+				defaultChecked={!!textLines[index]}
+				defaultValue={JSON.stringify({
 					episodeId: id,
 					url: textLines[index]
 				})}

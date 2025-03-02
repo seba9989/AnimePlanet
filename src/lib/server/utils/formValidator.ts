@@ -1,34 +1,61 @@
 import { type, type Type } from 'arktype';
 
-const typeReg = /\[(.*)\]/m;
+const typeKeyReg = /__type__.*/m;
+
+export type DeclaredType = '[array]' | '[string]' | '[number]' | '[boolean]' | '[object]';
+
+type FormDataType = string | number | boolean | object | File | undefined;
+const parseString = (string: string): FormDataType => {
+	if (string.trim() === '') {
+		return undefined;
+	} else if (!isNaN(Number(string))) {
+		return Number(string);
+	} else if (string.toLowerCase() === 'true' || string.toLowerCase() === 'false') {
+		return string.toLowerCase() === 'true';
+	} else {
+		try {
+			return JSON.parse(string);
+		} catch {
+			return string;
+		}
+	}
+};
 
 export const extractForm = (formData: FormData) => {
 	const formDataJson: { [key: string]: unknown } = {};
 
 	formData.forEach((value, key) => {
-		let parsedValue: string | number | boolean | object | File | undefined = value;
+		if (typeKeyReg.test(key)) return;
+
+		const declaredType = formData.get(`__type__${key}`) as DeclaredType;
+
+		let parsedValue: FormDataType = value;
 
 		if (typeof value === 'string') {
-			if (typeReg.test(value)) {
-				const fixedType = value.match(typeReg) as RegExpMatchArray;
-
-				switch (fixedType[1]) {
-					case 'array':
-						parsedValue = undefined;
-						break;
-				}
-			} else if (!(value.trim() === '')) {
-				if (!isNaN(Number(value))) {
+			switch (declaredType) {
+				case '[array]':
+					parsedValue = [parseString(value)];
+					break;
+				case '[string]':
+					parsedValue = value;
+					break;
+				case '[number]':
 					parsedValue = Number(value);
-				} else if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
-					parsedValue = value.toLowerCase() === 'true';
-				} else {
+					break;
+				case '[boolean]':
+					parsedValue = !!value;
+					break;
+				case '[object]':
 					try {
 						parsedValue = JSON.parse(value);
 					} catch {
-						parsedValue = value;
+						return;
 					}
-				}
+					break;
+
+				default:
+					parsedValue = parseString(value);
+					break;
 			}
 		}
 
@@ -36,7 +63,11 @@ export const extractForm = (formData: FormData) => {
 
 		if (keys.has(key)) {
 			if (Array.isArray(formDataJson[key])) {
-				formDataJson[key] = [...formDataJson[key], parsedValue];
+				if (Array.isArray(parsedValue)) {
+					formDataJson[key].push(...parsedValue);
+				} else {
+					formDataJson[key].push(parsedValue);
+				}
 			} else if (formDataJson[key]) {
 				formDataJson[key] = [formDataJson[key], parsedValue];
 			} else {

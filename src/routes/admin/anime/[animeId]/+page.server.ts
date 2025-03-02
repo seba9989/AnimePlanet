@@ -33,8 +33,8 @@ const linkType = type({
 const saveType = type({
 	title: 'string',
 	tags: 'string[]',
-	embeds: type(linkType, '[]').or('undefined'),
-	downloads: type(linkType, '[]').or('undefined')
+	'embeds?': type(linkType, '[]'),
+	'downloads?': type(linkType, '[]')
 });
 
 const removeEpisodeType = type({

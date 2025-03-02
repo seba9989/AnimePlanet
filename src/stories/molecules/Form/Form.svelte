@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import type { DeclaredType } from '$lib/server/utils/formValidator';
 	import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getContext, setContext, type Snippet } from 'svelte';
@@ -9,7 +10,7 @@
 	type ActionFunction = (args: ActionFunctionArgs) => void;
 
 	type Props = HTMLFormAttributes & {
-		children: Snippet;
+		children?: Snippet;
 		onSuccess?: ActionFunction;
 		onError?: ActionFunction;
 		onFailure?: ActionFunction;
@@ -19,7 +20,7 @@
 		isErrorHandl?: boolean;
 		isReset?: boolean;
 
-		types?: Record<string, '[array]'>;
+		types?: Record<string, DeclaredType>;
 	};
 
 	let {
@@ -83,7 +84,7 @@
 	}}
 >
 	{#each Object.entries(types) as [name, value]}
-		<input type="checkbox" defaultChecked class="hidden" {name} {value} />
+		<input type="checkbox" defaultChecked class="hidden" name="__type__{name}" {value} />
 	{/each}
-	{@render children()}
+	{@render children?.()}
 </form>

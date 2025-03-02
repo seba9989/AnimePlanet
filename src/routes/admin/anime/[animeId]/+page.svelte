@@ -52,7 +52,9 @@
 		action="?/save"
 		onAll={changeMode}
 		types={{
-			tags: '[array]'
+			tags: '[array]',
+			embeds: '[array]',
+			downloads: '[array]'
 		}}
 	>
 		{#if saveMode}
@@ -124,37 +126,6 @@
 			</label>
 		</div>
 	</Form>
-
-	{#snippet linksTable(type: string, links: Link[])}
-		<div class="table-wrap">
-			<table class="table caption-bottom">
-				<thead>
-					<tr>
-						<th>{type}s</th>
-						<th>Hosting</th>
-						<th>Link</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody class="hover:[&>tr]:preset-tonal-primary">
-					{#each links as link, i}
-						<tr>
-							<td> {i}</td>
-							<td>{urlToHosting(link.url)}</td>
-							<td><a href={link.url} class="anchor">{link.url}</a></td>
-							<td class="!text-right">
-								<Form action="?/remove{type}" id={link.id}>
-									<input type="checkbox" class="hidden" checked value={link.id} name="id" />
-									<button class="btn preset-tonal" type="submit">Remove link</button>
-								</Form>
-							</td>
-						</tr>
-					{/each}
-					<tr></tr>
-				</tbody>
-			</table>
-		</div>
-	{/snippet}
 
 	<div class="table-wrap">
 		<table class="table grid grid-cols-[auto_1fr_auto_auto_auto]">
