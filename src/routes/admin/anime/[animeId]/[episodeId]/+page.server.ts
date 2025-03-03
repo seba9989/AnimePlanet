@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { removeLink, updateEpisode } from '$lib/server/db/utils/creators';
+import { removeLink, updateEpisode } from '$lib/server/db/utils';
 import { validForm } from '$lib/server/utils/formValidator';
 import type { Actions, PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';

@@ -1,38 +1,60 @@
 <script lang="ts">
 	import type { Episode } from '$lib/server/db/schema';
+	import { cn } from '$lib/utils/cn';
 	import type { HTMLTextareaAttributes } from 'svelte/elements';
 
-	type Props = { episodes: Episode[] } & HTMLTextareaAttributes;
+	type Props = { episodes: Episode[]; name: string } & HTMLTextareaAttributes;
 
 	let { episodes, name, ...props }: Props = $props();
 
-	const minLines = episodes.length;
+	let minLines = $derived(episodes.length);
 
-	let text = $state(Array(minLines).fill('').join('\n'));
+	let text = $state('');
 
-	console.log(minLines);
+	let textLines = $derived.by(() => text.split('\n'));
 
-	let textLines = $derived(text.split('\n'));
+	$effect(() => {
+		while (textLines.length < minLines) {
+			textLines.push('');
+			text = textLines.join('\n');
+		}
+		while (textLines.length > minLines && textLines.at(-1)?.trim() == '') {
+			console.log('test');
+
+			if (textLines.at(-1)?.trim() == '') {
+				console.log(textLines.at(-1)?.trim() === '');
+
+				textLines.pop();
+				console.log(textLines);
+
+				text = textLines.join('\n');
+			}
+		}
+	});
 
 	$effect(() => {
 		text ||= Array(minLines).fill('').join('\n');
 	});
 </script>
 
-<div class="input-group flex overflow-hidden font-mono">
+<div class={cn(['input-group flex overflow-hidden font-mono'], props.disabled && '!brightness-50')}>
 	<div class="select-none px-2 py-1 text-right">
-		{#each episodes as { id, episodeNumber }, index}
-			<div>{episodeNumber}</div>
-			<input
-				class="hidden"
-				type="checkbox"
-				defaultChecked={!!textLines[index]}
-				defaultValue={JSON.stringify({
-					episodeId: id,
-					url: textLines[index]
-				})}
-				{name}
-			/>
+		{#each textLines as textLine, i}
+			{#if i >= episodes.length}
+				<div class="preset-tonal-error grid place-items-center">!</div>
+			{:else}
+				<div>{episodes[i].episodeNumber}</div>
+				<input
+					class="hidden"
+					type="checkbox"
+					defaultChecked={!(textLine.trim() === '')}
+					defaultValue={JSON.stringify({
+						episodeId: episodes[i].id,
+						url: textLine
+					})}
+					{name}
+				/>
+			{/if}
 		{/each}
 	</div>
 

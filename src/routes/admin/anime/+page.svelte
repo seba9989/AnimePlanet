@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import Search from '$components/atoms/Input/Search/Search.svelte';
-	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
-	import Form from '$components/molecules/Form/Form.svelte';
+	import Form from '$components/molecules/Form';
 	import { animeListByTitle } from '$lib/apiHandlers/aniList';
 	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
 	import type { PageData } from './$types';
-	import { Accordion, Modal } from '@skeletonlabs/skeleton-svelte';
+	import { Modal } from '@skeletonlabs/skeleton-svelte';
 	import { ArrowUpRight } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -14,6 +13,11 @@
 	let anime = $state(data.anime);
 
 	let title = $state('');
+	let searchedAnime = $state<Awaited<ReturnType<typeof animeListByTitle>>>();
+
+	$effect(() => {
+		animeListByTitle(title ?? undefined).then((v) => (searchedAnime = v));
+	});
 
 	let openState = $state(false);
 
@@ -49,7 +53,7 @@
 			<header class="flex justify-between">
 				<h2 class="h2">Add Anime</h2>
 			</header>
-			<Form action="?/addAnime" class="flex flex-col gap-4" onAll={modalClose}>
+			<Form action="?/addAnime" class="flex flex-col gap-4" onSuccess={modalClose}>
 				<div class="input-group grid-flow-row divide-x divide-surface-200-800">
 					<input
 						name="title"
@@ -59,100 +63,60 @@
 					/>
 				</div>
 				<select class="select overflow-auto" name="malId" size="4" value="1">
-					{#await animeListByTitle(title)}
-						{#each new Array(4) as _}
-							<option class="">&nbsp;</option>
+					{#if searchedAnime && searchedAnime.length > 0}
+						{#each searchedAnime as anime}
+							<option value={anime?.idMal}>{anime?.title?.romaji}</option>
 						{/each}
-					{:then anime}
-						{#if anime.length > 0}
-							{#each anime as anime}
-								<option value={anime?.idMal}>{anime?.title?.romaji}</option>
-							{/each}
-						{:else}
-							{#each new Array(4) as _}
-								<option class="">&nbsp;</option>
-							{/each}
-						{/if}
-					{/await}
+					{/if}
 				</select>
 
 				<div class="ml-auto flex gap-4">
 					<button type="button" class="btn preset-tonal" onclick={modalClose}>Cancel</button>
-					<Confirm>Confirm</Confirm>
+					<Form.Confirm>Confirm</Form.Confirm>
 				</div>
 			</Form>
 		{/snippet}
 	</Modal>
 </div>
 
-{#if anime[0]}
-	<Accordion collapsible>
-		{#each anime as anime}
-			<hr class="hr" />
-			<Accordion.Item value={anime.title}>
-				{#snippet lead()}<a href="anime/{anime.id}" class="btn-icon preset-tonal"
-						><ArrowUpRight /></a
-					>{/snippet}
-				{#snippet control()}{anime.title}{/snippet}
-				<!-- Panel -->
-				{#snippet panel()}
-					<div class="table-wrap">
-						<table class="table caption-bottom">
-							<thead>
-								<tr>
-									<th>Np.</th>
-									<th>Title</th>
-									<th>Video</th>
-									<th>Download</th>
-									<th class="!text-right">
-										{#if anime.malId}
-											<Form action="?/updateEpisodesList" onAll={modalClose}>
-												<input
-													type="checkbox"
-													checked
-													class="hidden"
-													name="animeId"
-													value={anime.id}
-												/>
-												<input
-													type="checkbox"
-													checked
-													class="hidden"
-													name="malId"
-													value={anime.malId}
-												/>
-												<Confirm>Update list</Confirm>
-											</Form>
-										{/if}
-									</th>
-								</tr>
-							</thead>
-							<tbody class="hover:[&>tr]:preset-tonal-primary">
-								{#each anime.episodes as { episodeNumber, title, id }}
-									<tr>
-										<td>
-											{episodeNumber}
-										</td>
-										<td>{title}</td>
-										<td><input type="text" class="input" form={id} name="videoUrl" /></td>
-										<td><input type="text" class="input" form={id} name="downloadUrl" /></td>
-										<td class="!text-right">
-											<Form action="?/addLinkToEpisode" {id}>
-												<input type="text" class="hidden" value={id} name="episodeId" />
-												<Confirm>Add link</Confirm>
-											</Form>
-										</td>
-									</tr>
-								{/each}
-								<tr></tr>
-							</tbody>
-						</table>
-					</div>
-				{/snippet}
-			</Accordion.Item>
-		{/each}
-		<hr class="hr" />
-	</Accordion>
+{#if anime.length > 0}
+	<div class="table-wrap">
+		<table class="table caption-bottom">
+			<thead>
+				<tr>
+					<th>Open</th>
+					<th>Title</th>
+					<th class="!text-right">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="hover:[&>tr]:backdrop-brightness-75">
+				{#each anime as anime}
+					<tr>
+						<th>
+							<a href="anime/{anime.id}" class="btn-icon preset-tonal"><ArrowUpRight /></a>
+						</th>
+						<th>{anime.title}</th>
+						<th class="flex justify-end">
+							<Form
+								action="?/removeAnime"
+								staticValues={{
+									id: anime.id
+								}}
+							>
+								<Form.Confirm class="preset-tonal-error">Remove</Form.Confirm>
+							</Form>
+						</th>
+					</tr>
+				{/each}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="2">Total</td>
+					<td class="text-right">{anime.length} Anime</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
 {:else}
 	<h2 class="h1 m-auto">Nie ma jeszcze żadnych anime.</h2>
 {/if}

@@ -14,7 +14,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 if (!env.DC_BOT_TOKEN) throw new Error('DC_BOT_TOKEN is not set');
 if (!env.DC_EPISODES_CHANNEL) throw new Error('DC_EPISODES_CHANNEL is not set');
 
-export const send = async (episodeId: string, originUrl: string) => {
+export const sendEpisode = async (episodeId: string, originUrl: string) => {
 	const episode = await db.query.episode.findFirst({
 		where: (episode, { eq }) => eq(episode.id, episodeId),
 		with: {
@@ -39,7 +39,60 @@ export const send = async (episodeId: string, originUrl: string) => {
 	if (!(episodesChannel instanceof TextChannel) && !(episodesChannel instanceof NewsChannel))
 		return;
 
-	await episodesChannel.send({ embeds: [episodeEmbed] });
+	let content = '**Zapraszamy do oglądania!**';
+	if (env.DC_ROLE_ID) content += ` <@&${env.DC_ROLE_ID}>`;
+
+	await episodesChannel.send({
+		embeds: [episodeEmbed],
+		content
+	});
+};
+
+export const sendAnime = async (animeId: string, originUrl: string) => {
+	const anime = await db.query.anime.findFirst({
+		where: (anime, { eq }) => eq(anime.id, animeId),
+		with: {
+			episodes: {
+				columns: {
+					episodeNumber: true
+				},
+				orderBy: (episodes, { asc }) => [asc(episodes.episodeNumber)]
+			}
+		}
+	});
+
+	if (!anime) return;
+
+	const animeUrl = encodeURI(`${originUrl}/anime/${anime.title}`);
+
+	// inside a command, event listener, etc.
+	const animeEmbed = new EmbedBuilder()
+		.setColor(0x0099ff)
+		.setTitle(
+			`${anime.title} ${anime.episodes.at(0)?.episodeNumber}-${anime.episodes.at(-1)?.episodeNumber}`
+		)
+		.setURL(animeUrl)
+		.setDescription(
+			anime.episodes
+				.map(({ episodeNumber }) => `[Episode ${episodeNumber}](${animeUrl}/${episodeNumber})`)
+				.join('\n')
+		)
+		.setImage(anime.coverImageUrl)
+		.setTimestamp()
+		.setFooter({ text: 'AnimePlanet', iconURL: `${originUrl}/favicon.png` });
+
+	const episodesChannel = await client.channels.fetch(env.DC_EPISODES_CHANNEL);
+
+	if (!(episodesChannel instanceof TextChannel) && !(episodesChannel instanceof NewsChannel))
+		return;
+
+	let content = '**Zapraszamy do oglądania!**';
+	if (env.DC_ROLE_ID) content += ` <@&${env.DC_ROLE_ID}>`;
+
+	await episodesChannel.send({
+		embeds: [animeEmbed],
+		content
+	});
 };
 
 const botInit = async () => {

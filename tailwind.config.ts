@@ -19,7 +19,14 @@ export default {
 		containerQueries,
 		skeleton({
 			// NOTE: each theme included will increase the size of your CSS bundle
-			themes: [themes.cerberus, themes.mint, themes.mona, themes.pine]
+			themes: [
+				themes.cerberus,
+				themes.mint,
+				themes.mona,
+				themes.pine,
+				themes.wintry,
+				themes.terminus
+			]
 			// themes: [...themes]
 		}),
 		plugin(({ matchUtilities, theme }) => {

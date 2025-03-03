@@ -4,11 +4,12 @@
 	import { cn } from '$lib/utils/cn';
 	import { setQueryParam, type SetQueryParamConfig } from '$lib/utils/queryParams';
 	import { Search } from 'lucide-svelte';
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLButtonAttributes, HTMLInputAttributes } from 'svelte/elements';
 
 	type Props = HTMLInputAttributes & {
 		wrapperClass?: string;
 		setQueryParam: Prettify<Omit<SetQueryParamConfig, 'value'>>;
+		onclick: HTMLButtonAttributes['onclick'];
 	};
 
 	let { wrapperClass, onclick, setQueryParam: setQueryParamConfig, ...props }: Props = $props();
@@ -27,10 +28,9 @@
 	<input {...props} bind:value onkeyup={() => setQueryParam({ ...setQueryParamConfig, value })} />
 
 	<button
-		onclick={() => {
+		onclick={(event) => {
 			setQueryParam({ ...setQueryParamConfig, value });
-			// @ts-expect-error
-			onclick();
+			onclick?.(event);
 		}}
 		class="input-group-cell preset-tonal-surface"
 	>

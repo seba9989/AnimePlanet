@@ -4,10 +4,10 @@ const typeKeyReg = /__type__.*/m;
 
 export type DeclaredType = '[array]' | '[string]' | '[number]' | '[boolean]' | '[object]';
 
-type FormDataType = string | number | boolean | object | File | undefined;
+export type FormDataType = string | number | boolean | object | File | undefined;
 const parseString = (string: string): FormDataType => {
 	if (string.trim() === '') {
-		return undefined;
+		return;
 	} else if (!isNaN(Number(string))) {
 		return Number(string);
 	} else if (string.toLowerCase() === 'true' || string.toLowerCase() === 'false') {
@@ -58,6 +58,8 @@ export const extractForm = (formData: FormData) => {
 					break;
 			}
 		}
+
+		if (parsedValue === undefined) return;
 
 		const keys = new Set(Object.keys(formDataJson));
 

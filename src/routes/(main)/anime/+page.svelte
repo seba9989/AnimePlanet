@@ -41,7 +41,7 @@
 />
 
 <form class="flex flex-wrap gap-4">
-	{#each data.tags as tag, i}
+	{#each data.tags as tag}
 		<label class="flex items-center space-x-2">
 			<input
 				bind:checked={selectedTags[tag.name]}

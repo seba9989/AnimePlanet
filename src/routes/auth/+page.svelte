@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Input from '$components/atoms/Input/Input.svelte';
 	import Form from '$components/molecules/Form/Form.svelte';
 </script>

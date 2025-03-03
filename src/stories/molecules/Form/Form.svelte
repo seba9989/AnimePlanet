@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { DeclaredType } from '$lib/server/utils/formValidator';
+	import { cn } from '$lib/utils/cn';
 	import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getContext, setContext, type Snippet } from 'svelte';
@@ -21,6 +22,7 @@
 		isReset?: boolean;
 
 		types?: Record<string, DeclaredType>;
+		staticValues?: Record<string, unknown>;
 	};
 
 	let {
@@ -35,7 +37,9 @@
 		isReset = true,
 
 		types = {},
+		staticValues = {},
 		children,
+		class: className,
 		...formProps
 	}: Props = $props();
 
@@ -56,8 +60,17 @@
 <form
 	method="post"
 	{...formProps}
+	class={cn(['contents', className])}
 	{onsubmit}
-	use:enhance={() => {
+	use:enhance={({ formData }) => {
+		for (const [key, value] of Object.entries(types)) {
+			formData.append(`__type__${key}`, value);
+		}
+
+		for (const [key, value] of Object.entries(staticValues)) {
+			formData.append(key, value as string);
+		}
+
 		return async (enhanceArgs) => {
 			const { result, update } = enhanceArgs;
 			if (result.type == 'success') {
@@ -83,8 +96,5 @@
 		};
 	}}
 >
-	{#each Object.entries(types) as [name, value]}
-		<input type="checkbox" defaultChecked class="hidden" name="__type__{name}" {value} />
-	{/each}
 	{@render children?.()}
 </form>

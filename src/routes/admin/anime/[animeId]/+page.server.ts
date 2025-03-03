@@ -1,6 +1,11 @@
 import { db } from '$lib/server/db';
-import { createEpisode, removeEpisode, updateAnimeById } from '$lib/server/db/utils/creators';
-import { send } from '$lib/server/discord';
+import {
+	createEpisode,
+	createEpisodeByMal,
+	removeEpisode,
+	updateAnimeById
+} from '$lib/server/db/utils';
+import { sendAnime, sendEpisode } from '$lib/server/discord';
 import { validForm } from '$lib/server/utils/formValidator';
 import type { Actions, PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
@@ -38,12 +43,16 @@ const saveType = type({
 });
 
 const removeEpisodeType = type({
-	id: 'string'
+	episodeId: 'string'
 });
 
 const createEpisodeType = type({
 	episodeNumber: 'number',
 	title: 'string'
+});
+
+const updateEpisodesListType = type({
+	animeMalId: 'number'
 });
 
 const sendEpisodeType = type({
@@ -60,7 +69,7 @@ export const actions = {
 		if (errors) return error(400, errors);
 
 		await updateAnimeById({
-			id: animeId,
+			animeId,
 			...data
 		});
 	},
@@ -70,7 +79,7 @@ export const actions = {
 
 		if (errors) return error(400, errors);
 
-		await removeEpisode(data);
+		await removeEpisode({ id: data.episodeId });
 	},
 	createEpisode: async (event) => {
 		const formData = await event.request.formData();
@@ -80,6 +89,14 @@ export const actions = {
 
 		await createEpisode({ animeId: event.params.animeId, ...data });
 	},
+	updateEpisodesList: async (event) => {
+		const formData = await event.request.formData();
+		const { data, errors } = validForm(formData, updateEpisodesListType);
+
+		if (errors) return error(400, errors);
+
+		await createEpisodeByMal({ ...data, animeId: event.params.animeId });
+	},
 	// TODO: Automate sending notification
 	sendEpisode: async (event) => {
 		const formData = await event.request.formData();
@@ -87,6 +104,9 @@ export const actions = {
 
 		if (errors) return error(400, errors);
 
-		await send(data.episodeId, event.url.origin);
+		await sendEpisode(data.episodeId, event.url.origin);
+	},
+	sendAnime: async (event) => {
+		await sendAnime(event.params.animeId, event.url.origin);
 	}
 } satisfies Actions;

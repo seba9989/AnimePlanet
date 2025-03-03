@@ -4,24 +4,19 @@
 	import Textarea from '$components/atoms/Textarea/Textarea.svelte';
 	import Form from '$components/molecules/Form';
 	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
-	import type { Link } from '$lib/server/db/schema';
-	import { urlToHosting } from '$lib/utils/urlToHosting.js';
 	import { Modal } from '@skeletonlabs/skeleton-svelte';
-	import { CircleX, Send } from 'lucide-svelte';
+	import { CircleX } from 'lucide-svelte';
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
 
 	let { data } = $props();
-	let {
-		anime: { episodes, ...anime },
-		tags
-	} = $derived(data);
+	let { anime: animeFull, tags } = $derived(data);
+
+	let { episodes, ...anime } = $derived(animeFull);
 
 	let saveMode = $state(true);
 
 	const changeMode = () => {
-		console.log(animeTags);
-
 		return (saveMode = !saveMode);
 	};
 
@@ -42,8 +37,6 @@
 	};
 
 	let openState = $state(false);
-
-	$inspect(openState);
 </script>
 
 <div>
@@ -57,11 +50,18 @@
 			downloads: '[array]'
 		}}
 	>
-		{#if saveMode}
-			<button onclick={changeMode} type="button" class="btn ml-auto preset-filled">Edit</button>
-		{:else}
-			<Confirm class="btn ml-auto preset-tonal-primary">Save</Confirm>
-		{/if}
+		<div class="flex justify-end gap-4">
+			<Form>
+				<Form.Confirm class="btn preset-tonal" formaction="?/sendAnime" resetStyle>
+					Send Anime
+				</Form.Confirm>
+			</Form>
+			{#if saveMode}
+				<button onclick={changeMode} type="button" class="btn preset-filled">Edit</button>
+			{:else}
+				<Confirm class="btn preset-tonal-primary">Save</Confirm>
+			{/if}
+		</div>
 		<div class="grid grid-cols-[auto_1fr_1fr_1fr] gap-4">
 			<Cover img={anime.coverImageUrl} class="min-w-60" />
 
@@ -94,7 +94,13 @@
 								<span>
 									{tag}
 								</span>
-								<input checked type="checkbox" value={tag} name="tags" class="hidden" />
+								<input
+									type="checkbox"
+									defaultChecked
+									defaultValue={tag}
+									name="tags"
+									class="hidden"
+								/>
 							</button>
 						{/each}
 					</div>
@@ -130,11 +136,21 @@
 	<div class="table-wrap">
 		<table class="table grid grid-cols-[auto_1fr_auto_auto_auto]">
 			<thead class="col-span-5 grid grid-cols-subgrid items-center">
-				<tr class="col-span-3 grid grid-cols-subgrid">
+				<tr class="col-span-2 grid grid-cols-subgrid">
 					<th>Np.</th>
 					<th>Title</th>
 				</tr>
-				<tr class="col-span-2 ml-auto">
+				<tr class=" flex col-span-3 ml-auto">
+					<th>
+						<Form
+							action="?/updateEpisodesList"
+							staticValues={{
+								animeMalId: anime.malId
+							}}
+						>
+							<Form.Confirm class="preset-tonal-primary">Update Episode List</Form.Confirm>
+						</Form>
+					</th>
 					<th>
 						<Modal
 							bind:open={openState}
@@ -169,15 +185,19 @@
 			<tbody class="col-span-5 grid grid-cols-subgrid hover:[&>tr]:backdrop-brightness-75">
 				{#each episodes as episode}
 					<tr class="col-span-5 grid grid-cols-subgrid items-center">
-						<th>{episode.episodeNumber}</th>
+						<th class="font-mono">{episode.episodeNumber}</th>
 						<th>{episode.title}</th>
 						<th>
 							<a href="{page.params.animeId}/{episode.id}" class="btn preset-tonal-primary">Edit</a>
 						</th>
 						<th>
-							<Form action="?/removeEpisode">
-								<input class="hidden" type="checkbox" defaultChecked name="id" value={episode.id} />
-								<button class="btn preset-tonal-error">Remove</button>
+							<Form
+								action="?/removeEpisode"
+								staticValues={{
+									episodeId: episode.id
+								}}
+							>
+								<Form.Confirm class="btn preset-tonal-error">Remove</Form.Confirm>
 							</Form>
 						</th>
 						<th>
