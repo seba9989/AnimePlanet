@@ -3,7 +3,6 @@ import * as themes from '@skeletonlabs/skeleton/themes';
 import containerQueries from '@tailwindcss/container-queries';
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
-
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
@@ -20,7 +19,14 @@ export default {
 		containerQueries,
 		skeleton({
 			// NOTE: each theme included will increase the size of your CSS bundle
-			themes: [themes.cerberus, themes.mint, themes.mona, themes.pine]
+			themes: [
+				themes.cerberus,
+				themes.mint,
+				themes.mona,
+				themes.pine,
+				themes.wintry,
+				themes.terminus
+			]
 			// themes: [...themes]
 		}),
 		plugin(({ matchUtilities, theme }) => {

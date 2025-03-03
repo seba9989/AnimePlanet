@@ -1,9 +1,9 @@
 import { db } from '$lib/server/db';
-import { error } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { removeLink, updateEpisode } from '$lib/server/db/utils';
 import { validForm } from '$lib/server/utils/formValidator';
+import type { Actions, PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
 import { type } from 'arktype';
-import { removeLink, updateEpisode } from '$lib/server/db/utils/creators';
 
 export const load = (async ({ params }) => {
 	const animeData = await db.query.anime.findFirst({
@@ -64,5 +64,5 @@ export const actions = {
 		console.log(data);
 
 		await updateEpisode({ id: event.params.episodeId, ...data });
-	},
+	}
 } satisfies Actions;

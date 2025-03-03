@@ -1,13 +1,28 @@
-import { hash, verify } from '@node-rs/argon2';
-import { error, fail, redirect } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import type { Actions, PageServerLoad } from './$types';
 import { validForm } from '$lib/server/utils/formValidator';
+import type { Actions, PageServerLoad } from './$types';
+import { hash, verify } from '@node-rs/argon2';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { type } from 'arktype';
 
 export const load: PageServerLoad = async (event) => {
+	const user = await db.query.user.findFirst({
+		with: {
+			groups: {
+				columns: {
+					role: true
+				},
+				with: {
+					group: true
+				}
+			}
+		}
+	});
+
+	console.log(user);
+
 	if (event.locals.user) {
 		return redirect(302, '/');
 	}
@@ -30,7 +45,7 @@ const registerType = type({
 				return ctx.reject('passwords must be the same');
 			}
 		})
-		.to('8 < string <= 255')
+		.to('8 <= string <= 255')
 });
 
 export const actions: Actions = {

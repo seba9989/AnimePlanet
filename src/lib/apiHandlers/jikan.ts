@@ -33,7 +33,5 @@ export const jikanEpisodes = async (mal_animeId: number): Promise<TEpisode[]> =>
 		}
 	}
 
-	console.log(data);
-
 	return data;
 };

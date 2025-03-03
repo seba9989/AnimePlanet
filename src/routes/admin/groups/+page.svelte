@@ -1,54 +1,47 @@
 <script lang="ts">
-	import { Pagination } from '@skeletonlabs/skeleton-svelte';
-	// Icons
-	import IconArrowLeft from 'lucide-svelte/icons/arrow-left';
-	import IconArrowRight from 'lucide-svelte/icons/arrow-right';
-	import IconEllipsis from 'lucide-svelte/icons/ellipsis';
-	import IconFirst from 'lucide-svelte/icons/chevrons-left';
-	import IconLast from 'lucide-svelte/icons/chevron-right';
+	import Search from '$components/atoms/Input/Search/Search.svelte';
+	import Form from '$components/molecules/Form';
 	import type { PageData } from './$types';
+	import { Modal } from '@skeletonlabs/skeleton-svelte';
 
 	let { data }: { data: PageData } = $props();
-	console.log(data.groups);
+	let { groups } = $derived(data);
+
+	let openState = $state(true);
+	const close = () => (openState = !openState);
+
+	$inspect(groups);
 </script>
 
-<!-- <section class="space-y-4">
-	<div class="table-wrap">
-		<table class="table table-fixed caption-bottom">
-			<thead>
-				<tr>
-					<th>Logo</th>
-					<th>Nazwa</th>
-					<th>Administracja</th>
-					<th>Moderacja</th>
-				</tr>
-			</thead>
-			<tbody class="hover:[&>tr]:preset-tonal-primary">
-			</tbody>
-		</table>
-	</div>
-	<footer class="flex justify-between">
-		<select name="size" id="size" class="select max-w-[150px]" bind:value={size}>
-			{#each [1, 2, 5] as v}
-				<option value={v}>Items {v}</option>
-			{/each}
-			<option value={sourceData.length}>Show All</option>
-		</select>
-		<Pagination bind:data={sourceData} bind:page bind:pageSize={size} siblingCount={4}>
-			{#snippet labelEllipsis()}<IconEllipsis class="size-4" />{/snippet}
-			{#snippet labelNext()}<IconArrowRight class="size-4" />{/snippet}
-			{#snippet labelPrevious()}<IconArrowLeft class="size-4" />{/snippet}
-			{#snippet labelFirst()}<IconFirst class="size-4" />{/snippet}
-			{#snippet labelLast()}<IconLast class="size-4" />{/snippet}
-		</Pagination>
-	</footer>
-</section> -->
-
-<!-- {#each slicedSource(sourceData) as row}
-					<tr>
-						<td>{row.position}</td>
-						<td>{row.name}</td>
-						<td>{row.weight}</td>
-						<td class="text-right">{row.symbol}</td>
-					</tr>
-				{/each} -->
+<div class="flex justify-between">
+	<Search
+		wrapperClass="w-full max-w-2xl"
+		placeholder="Szukany tytuł"
+		setQueryParam={{
+			name: 'title'
+		}}
+	/>
+	<Modal
+		bind:open={openState}
+		triggerBase="btn preset-tonal"
+		contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-md  w-[90%] max-w-screen-md"
+		backdropClasses="backdrop-blur-sm"
+	>
+		{#snippet trigger()}Add Group{/snippet}
+		{#snippet content()}
+			<h2 class="h2">Add Group</h2>
+			<Form action="?/addGroup" class="gap-4 grid" onSuccess={close}>
+				<input type="text" name="name" placeholder="Nazwa grupy" class="input" />
+				<select class="select" name="type" value="SUBTITLES">
+					{#each Object.entries( { INTERNAL: 'Wewnętrzna', VOICEOVER: 'Lektor', SUBTITLES: 'Napisy' } ) as [value, description]}
+						<option {value}>{description}</option>
+					{/each}
+				</select>
+				<div class="flex ml-auto gap-4">
+					<button onclick={close} type="button" class="btn preset-tonal">Close</button>
+					<Form.Confirm>Confirm</Form.Confirm>
+				</div>
+			</Form>
+		{/snippet}
+	</Modal>
+</div>

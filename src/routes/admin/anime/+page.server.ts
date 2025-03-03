@@ -1,15 +1,10 @@
 import { db } from '$lib/server/db';
-import {
-	createAnimeByMalId,
-	createLinksToEpisode,
-	updateEpisodesList
-} from '$lib/server/db/utils/creators';
+import { createAnimeByMalId, removeAnime, updateEpisodesList } from '$lib/server/db/utils';
 import { validForm } from '$lib/server/utils/formValidator';
+import type { PageServerLoad, Actions } from './$types';
+import { error } from '@sveltejs/kit';
 import { type } from 'arktype';
 
-import { error } from '@sveltejs/kit';
-
-import type { PageServerLoad, Actions } from './$types';
 export const load = (async () => {
 	const anime = await db.query.anime.findMany({
 		orderBy: (anime, { asc }) => [asc(anime.title)],
@@ -27,15 +22,13 @@ const addAnimeType = type({
 	malId: 'number'
 });
 
+const removeAnimeType = type({
+	id: 'string'
+});
+
 const updateEpisodesListType = type({
 	malId: 'number',
 	animeId: 'string'
-});
-
-const addLinkToEpisodeType = type({
-	episodeId: 'string',
-	'videoUrl?': 'string',
-	'downloadUrl?': 'string'
 });
 
 export const actions = {
@@ -45,11 +38,17 @@ export const actions = {
 
 		if (errors) return error(400, errors);
 
-		console.log(data);
-
 		await createAnimeByMalId(data);
 
 		return;
+	},
+	removeAnime: async (event) => {
+		const formData = await event.request.formData();
+		const { data, errors } = validForm(formData, removeAnimeType, { debug: true });
+
+		if (errors) return error(400, errors);
+
+		await removeAnime(data);
 	},
 	updateEpisodesList: async (event) => {
 		const formData = await event.request.formData();
@@ -60,14 +59,5 @@ export const actions = {
 		await updateEpisodesList(data);
 
 		return;
-	},
-	addLinkToEpisode: async (event) => {
-		const formData = await event.request.formData();
-
-		const { data, errors } = validForm(formData, addLinkToEpisodeType);
-
-		if (errors) return error(400, errors);
-
-		await createLinksToEpisode(data);
 	}
 } satisfies Actions;

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Logo from '$components/atoms/Logo/Logo.svelte';
 	import Search from '$components/atoms/Input/Search/Search.svelte';
+	import Logo from '$components/atoms/Logo/Logo.svelte';
 	import Navbar from '$components/molecules/Navbar/Navbar.svelte';
 	import { Modal } from '@skeletonlabs/skeleton-svelte';
 	import { Menu, X } from 'lucide-svelte';
@@ -37,7 +37,7 @@
 				wrapperClass="w-full max-w-2xl"
 				placeholder="Co chcesz dziś obejrzeć?"
 				setQueryParam={{
-					name: "title",
+					name: 'title',
 					pathname: '/anime'
 				}}
 			/>
@@ -49,7 +49,7 @@
 			wrapperClass="w-full max-w-2xl"
 			placeholder="Co chcesz dziś obejrzeć?"
 			setQueryParam={{
-				name: "title",
+				name: 'title',
 				pathname: '/anime'
 			}}
 		/>

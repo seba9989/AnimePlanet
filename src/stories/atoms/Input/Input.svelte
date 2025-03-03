@@ -1,14 +1,12 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
 	import Password from './Password/Password.svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLInputAttributes {
-		wrapperClass?: string;
-	}
+	type Props = HTMLInputAttributes;
 
 	let props: Props = $props();
 
-	const { type, wrapperClass } = props;
+	const { type } = props;
 </script>
 
 {#if type == 'password'}

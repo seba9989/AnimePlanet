@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import type { DeclaredType } from '$lib/server/utils/formValidator';
+	import { cn } from '$lib/utils/cn';
 	import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getContext, setContext, type Snippet } from 'svelte';
 	import type { HTMLFormAttributes } from 'svelte/elements';
-
-	import type { SubmitFunction } from '@sveltejs/kit';
 
 	type ActionFunctionArgs = Parameters<Exclude<Awaited<ReturnType<SubmitFunction>>, void>>[0];
 	type ActionFunction = (args: ActionFunctionArgs) => void;
 
 	type Props = HTMLFormAttributes & {
-		children: Snippet;
+		children?: Snippet;
 		onSuccess?: ActionFunction;
 		onError?: ActionFunction;
 		onFailure?: ActionFunction;
@@ -20,7 +21,8 @@
 		isErrorHandl?: boolean;
 		isReset?: boolean;
 
-		types?: Record<string, '[array]'>;
+		types?: Record<string, DeclaredType>;
+		staticValues?: Record<string, unknown>;
 	};
 
 	let {
@@ -35,7 +37,9 @@
 		isReset = true,
 
 		types = {},
+		staticValues = {},
 		children,
+		class: className,
 		...formProps
 	}: Props = $props();
 
@@ -56,8 +60,17 @@
 <form
 	method="post"
 	{...formProps}
+	class={cn(['contents', className])}
 	{onsubmit}
-	use:enhance={() => {
+	use:enhance={({ formData }) => {
+		for (const [key, value] of Object.entries(types)) {
+			formData.append(`__type__${key}`, value);
+		}
+
+		for (const [key, value] of Object.entries(staticValues)) {
+			formData.append(key, value as string);
+		}
+
 		return async (enhanceArgs) => {
 			const { result, update } = enhanceArgs;
 			if (result.type == 'success') {
@@ -83,8 +96,5 @@
 		};
 	}}
 >
-	{#each Object.entries(types) as [name, value]}
-		<input type="checkbox" defaultChecked class="hidden" {name} {value} />
-	{/each}
-	{@render children()}
+	{@render children?.()}
 </form>

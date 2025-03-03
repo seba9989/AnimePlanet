@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import Search from '$components/atoms/Input/Search/Search.svelte';
+	import AnimeList from '$components/organisms/AnimeList/AnimeList.svelte';
 	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
 	import type { Anime } from '$lib/server/db/schema';
 	import { setQueryParam } from '$lib/utils/queryParams';
 	import type { PageData } from './$types';
-	import Search from '$components/atoms/Input/Search/Search.svelte';
-	import AnimeList from '$components/organisms/AnimeList/AnimeList.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -41,7 +41,7 @@
 />
 
 <form class="flex flex-wrap gap-4">
-	{#each data.tags as tag, i}
+	{#each data.tags as tag}
 		<label class="flex items-center space-x-2">
 			<input
 				bind:checked={selectedTags[tag.name]}
