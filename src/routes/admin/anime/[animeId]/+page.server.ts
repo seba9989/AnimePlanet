@@ -48,7 +48,7 @@ const removeEpisodeType = type({
 
 const createEpisodeType = type({
 	episodeNumber: 'number',
-	title: 'string'
+	title: "string = ''"
 });
 
 const updateEpisodesListType = type({

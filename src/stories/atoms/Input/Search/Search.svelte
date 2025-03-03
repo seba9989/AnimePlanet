@@ -9,7 +9,7 @@
 	type Props = HTMLInputAttributes & {
 		wrapperClass?: string;
 		setQueryParam: Prettify<Omit<SetQueryParamConfig, 'value'>>;
-		onclick: HTMLButtonAttributes['onclick'];
+		onclick?: HTMLButtonAttributes['onclick'];
 	};
 
 	let { wrapperClass, onclick, setQueryParam: setQueryParamConfig, ...props }: Props = $props();
