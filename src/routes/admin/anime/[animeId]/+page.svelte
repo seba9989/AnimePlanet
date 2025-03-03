@@ -43,7 +43,11 @@
 	<Form
 		class="flex flex-col gap-4"
 		action="?/save"
-		onAll={changeMode}
+		onAll={(event) => {
+			if (event.action.search === '?/save') {
+				changeMode();
+			}
+		}}
 		types={{
 			tags: '[array]',
 			embeds: '[array]',
@@ -51,11 +55,9 @@
 		}}
 	>
 		<div class="flex justify-end gap-4">
-			<Form>
-				<Form.Confirm class="btn preset-tonal" formaction="?/sendAnime" resetStyle>
-					Send Anime
-				</Form.Confirm>
-			</Form>
+			<Form.Confirm class="btn preset-tonal" formaction="?/sendAnime" resetStyle>
+				Send Anime
+			</Form.Confirm>
 			{#if saveMode}
 				<button onclick={changeMode} type="button" class="btn preset-filled">Edit</button>
 			{:else}
