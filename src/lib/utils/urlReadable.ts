@@ -7,7 +7,7 @@ export const unicodeMap = new BiMap([
 	['~eq', '='],
 	['~s', '/'],
 	['~p', '%'],
-	['~u', '-'],
+	['~u', '_'],
 	['_', ' ']
 ]);
 
