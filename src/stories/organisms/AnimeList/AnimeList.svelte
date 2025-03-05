@@ -14,7 +14,11 @@
 <div class="grid gap-4 grid-grow-36 md:grid-grow-44">
 	{#each anime as anime (anime.title)}
 		<div animate:flip={{ duration: 500 }} in:scale={{ duration: 500 }}>
-			<Cover img={anime.coverImageUrl} title={anime.title} href="/anime/{anime.title}" />
+			<Cover
+				img={anime.coverImageUrl}
+				title={anime.title}
+				href="/anime/{encodeURIComponent(anime.title)}"
+			/>
 		</div>
 	{/each}
 </div>
