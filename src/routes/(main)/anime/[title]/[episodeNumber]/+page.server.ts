@@ -1,9 +1,10 @@
 import { db } from '$lib/server/db';
+import { decodeUrl } from '$lib/utils/urlReadable';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 
 export const load = (async ({ params }) => {
-	const animeTitle = params.title;
+	const animeTitle = decodeUrl(params.title);
 	const searchEpisodeNumber = Number(params.episodeNumber);
 
 	const anime = await db.query.anime.findFirst({
@@ -30,6 +31,7 @@ export const load = (async ({ params }) => {
 	if (!episode) error(404, 'Nie można odnaleźć odcinka');
 
 	return {
+		anime,
 		previousEpisode: !!episodes?.find(
 			({ episodeNumber }) => episodeNumber === searchEpisodeNumber - 1
 		),
