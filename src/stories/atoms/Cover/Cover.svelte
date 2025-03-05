@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils/cn';
+	import { encodeUrl } from '$lib/utils/urlReadable';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
 	export interface Props extends HTMLAnchorAttributes {
