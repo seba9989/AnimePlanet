@@ -23,7 +23,7 @@
 
 <div class="flex h-full flex-col gap-4">
 	<h1 class="h5 font-semibold">
-		Oglądasz: <a href="./" class="anchor font-normal">{page.params.title}</a>
+		Oglądasz: <a href="./" class="anchor font-normal">{data.anime?.title}</a>
 	</h1>
 
 	<div class="grid gap-4 md:grid-cols-[3fr_1fr]">

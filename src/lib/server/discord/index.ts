@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { encodeUrl } from '$lib/utils/urlReadable';
 import { db } from '../db';
 import {
 	Client,
@@ -24,11 +25,13 @@ export const sendEpisode = async (episodeId: string, originUrl: string) => {
 
 	if (!episode) return;
 
+	const animeUrl = `${originUrl}/anime/${encodeUrl(episode.anime.title)}/${episode.episodeNumber}`;
+
 	// inside a command, event listener, etc.
 	const episodeEmbed = new EmbedBuilder()
 		.setColor(0x0099ff)
 		.setTitle(`${episode.anime.title} ${episode.episodeNumber}`)
-		.setURL(encodeURI(`${originUrl}/anime/${episode.anime.title}/${episode.episodeNumber}`))
+		.setURL(animeUrl)
 		.setDescription(`Tytuł: ${episode.title}`)
 		.setImage(episode.anime.coverImageUrl)
 		.setTimestamp()
@@ -63,7 +66,7 @@ export const sendAnime = async (animeId: string, originUrl: string) => {
 
 	if (!anime) return;
 
-	const animeUrl = encodeURI(`${originUrl}/anime/${anime.title}`);
+	const animeUrl = `${originUrl}/anime/${encodeUrl(anime.title)}`;
 
 	// inside a command, event listener, etc.
 	const animeEmbed = new EmbedBuilder()

@@ -1,9 +1,10 @@
 import { db } from '$lib/server/db';
+import { decodeUrl } from '$lib/utils/urlReadable';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 
 export const load = (async (event) => {
-	const animeTitle = event.params.title;
+	const animeTitle = decodeUrl(event.params.title);
 
 	const anime = await db.query.anime.findFirst({
 		where: (anime, { eq }) => eq(anime.title, animeTitle),

@@ -96,7 +96,7 @@
 	<div class="grid gap-5 grid-grow-52">
 		{#each episodes as { episodeNumber, title }}
 			<a
-				href="/anime/{page.params.title}/{episodeNumber}"
+				href="/anime/{encodeURIComponent(page.params.title)}/{episodeNumber}"
 				class="flex h-20 overflow-hidden preset-filled-surface-50-950"
 			>
 				<div class="h2 flex aspect-square items-center justify-center bg-primary-800 font-bold">
