@@ -39,6 +39,7 @@
 
 	let openState = $state(false);
 
+	let shouldDownloadJSON = $state(false);
 	function downloadJSON() {
 		const jsonString = JSON.stringify(form?.exportedAnime, null, 2);
 
@@ -52,6 +53,13 @@
 
 		URL.revokeObjectURL(link.href);
 	}
+
+	$effect(() => {
+		if (form && shouldDownloadJSON) {
+			downloadJSON();
+			shouldDownloadJSON = false;
+		}
+	});
 </script>
 
 <div>
@@ -65,7 +73,7 @@
 		}}
 		onSuccess={(event) => {
 			if (event.action.search === '?/exportToJson') {
-				downloadJSON();
+				shouldDownloadJSON = true;
 			}
 		}}
 		types={{
