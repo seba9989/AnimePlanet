@@ -12,7 +12,6 @@ import {
 	type Video
 } from '../schema';
 import { tagDbPrototype, tagToAnimeDbPrototype } from './preFormating';
-import { error } from '@sveltejs/kit';
 import { type } from 'arktype';
 
 const linkType = type({
