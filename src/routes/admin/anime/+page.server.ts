@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { createAnimeByMalId, removeAnime, updateEpisodesList } from '$lib/server/db/utils';
+import { createAnimeByMalId, importedAnimeJson, removeAnime } from '$lib/server/db/utils';
 import { validForm } from '$lib/server/utils/formValidator';
 import type { PageServerLoad, Actions } from './$types';
 import { error } from '@sveltejs/kit';
@@ -17,7 +17,6 @@ export const load = (async () => {
 	return { anime };
 }) satisfies PageServerLoad;
 
-// const addAnimeSchema = vine.object({ malId: vine.number() });
 const addAnimeType = type({
 	malId: 'number'
 });
@@ -26,9 +25,8 @@ const removeAnimeType = type({
 	id: 'string'
 });
 
-const updateEpisodesListType = type({
-	malId: 'number',
-	animeId: 'string'
+const importAnime = type({
+	animeJson: type('File')
 });
 
 export const actions = {
@@ -44,20 +42,22 @@ export const actions = {
 	},
 	removeAnime: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = validForm(formData, removeAnimeType, { debug: true });
+		const { data, errors } = validForm(formData, removeAnimeType);
 
 		if (errors) return error(400, errors);
 
 		await removeAnime(data);
 	},
-	updateEpisodesList: async (event) => {
+	importAnime: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = validForm(formData, updateEpisodesListType);
+		const { data, errors } = validForm(formData, importAnime, { debug: true });
 
 		if (errors) return error(400, errors);
 
-		await updateEpisodesList(data);
-
-		return;
+		try {
+			await importedAnimeJson(data);
+		} catch (e) {
+			return error(400, (e as Error).message);
+		}
 	}
 } satisfies Actions;

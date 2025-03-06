@@ -5,7 +5,7 @@
 	import { animeListByTitle } from '$lib/apiHandlers/aniList';
 	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
 	import type { PageData } from './$types';
-	import { Modal } from '@skeletonlabs/skeleton-svelte';
+	import { FileUpload, Modal } from '@skeletonlabs/skeleton-svelte';
 	import { ArrowUpRight } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -19,10 +19,12 @@
 		animeListByTitle(title ?? undefined).then((v) => (searchedAnime = v));
 	});
 
-	let openState = $state(false);
+	let addAnimeOS = $state(false);
+	let importAnimeOS = $state(true);
 
 	function modalClose() {
-		openState = false;
+		importAnimeOS = false;
+		addAnimeOS = false;
 	}
 	$effect(() => {
 		createAnimeIndex(data.anime);
@@ -42,41 +44,72 @@
 			name: 'title'
 		}}
 	/>
-	<Modal
-		bind:open={openState}
-		triggerBase="btn preset-tonal"
-		contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-md  w-[90%] max-w-screen-md"
-		backdropClasses="backdrop-blur-sm"
-	>
-		{#snippet trigger()}Add Anime{/snippet}
-		{#snippet content()}
-			<header class="flex justify-between">
-				<h2 class="h2">Add Anime</h2>
-			</header>
-			<Form action="?/addAnime" class="flex flex-col gap-4" onSuccess={modalClose}>
-				<div class="input-group grid-flow-row divide-x divide-surface-200-800">
-					<input
-						name="title"
-						type="text"
-						bind:value={title}
-						placeholder="Ore dake Level Up na Ken: Season 2 - Arise from the Shadow"
+	<div class="space-x-4">
+		<Modal
+			bind:open={importAnimeOS}
+			triggerBase="btn preset-tonal"
+			contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-md  w-[90%] max-w-screen-md"
+			backdropClasses="backdrop-blur-sm"
+		>
+			{#snippet trigger()}Import Anime{/snippet}
+			{#snippet content()}
+				<header class="flex justify-between">
+					<h2 class="h2">Import Anime</h2>
+				</header>
+				<Form
+					action="?/importAnime"
+					class="flex flex-col gap-4"
+					onSuccess={modalClose}
+					enctype="multipart/form-data"
+				>
+					<FileUpload
+						name="animeJson"
+						accept="application/json"
+						maxFiles={10}
+						onFileChange={console.log}
+						onFileReject={console.error}
+						classes="w-full"
 					/>
-				</div>
-				<select class="select overflow-auto" name="malId" size="4" value="1">
-					{#if searchedAnime && searchedAnime.length > 0}
-						{#each searchedAnime as anime}
-							<option value={anime?.idMal}>{anime?.title?.romaji}</option>
-						{/each}
-					{/if}
-				</select>
+					<Form.Confirm class="w-fit ml-auto">Confirm</Form.Confirm>
+				</Form>
+			{/snippet}
+		</Modal>
+		<Modal
+			bind:open={addAnimeOS}
+			triggerBase="btn preset-tonal"
+			contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-md  w-[90%] max-w-screen-md"
+			backdropClasses="backdrop-blur-sm"
+		>
+			{#snippet trigger()}Add Anime{/snippet}
+			{#snippet content()}
+				<header class="flex justify-between">
+					<h2 class="h2">Add Anime</h2>
+				</header>
+				<Form action="?/addAnime" class="flex flex-col gap-4" onSuccess={modalClose}>
+					<div class="input-group grid-flow-row divide-x divide-surface-200-800">
+						<input
+							name="title"
+							type="text"
+							bind:value={title}
+							placeholder="Ore dake Level Up na Ken: Season 2 - Arise from the Shadow"
+						/>
+					</div>
+					<select class="select overflow-auto" name="malId" size="4" value="1">
+						{#if searchedAnime && searchedAnime.length > 0}
+							{#each searchedAnime as anime}
+								<option value={anime?.idMal}>{anime?.title?.romaji}</option>
+							{/each}
+						{/if}
+					</select>
 
-				<div class="ml-auto flex gap-4">
-					<button type="button" class="btn preset-tonal" onclick={modalClose}>Cancel</button>
-					<Form.Confirm>Confirm</Form.Confirm>
-				</div>
-			</Form>
-		{/snippet}
-	</Modal>
+					<div class="ml-auto flex gap-4">
+						<button type="button" class="btn preset-tonal" onclick={modalClose}>Cancel</button>
+						<Form.Confirm>Confirm</Form.Confirm>
+					</div>
+				</Form>
+			{/snippet}
+		</Modal>
+	</div>
 </div>
 
 {#if anime.length > 0}
