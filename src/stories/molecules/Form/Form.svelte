@@ -79,6 +79,9 @@
 			if (result.type == 'error') {
 				if (!isErrorHandl)
 					toast.create({ title: 'Error', description: result.error.message, type: 'error' });
+
+				console.error({ title: 'Error', description: result.error.message, type: 'error' });
+
 				onError?.(enhanceArgs);
 			}
 			if (result.type == 'failure') {

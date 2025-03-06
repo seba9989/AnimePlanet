@@ -108,6 +108,8 @@ export const validForm = <TParser extends Type>(
 
 	const out = parser(formDataJson);
 
+	if (options.debug) console.log(out);
+
 	if (out instanceof type.errors) {
 		return { errors: { message: out.summary } };
 	} else {

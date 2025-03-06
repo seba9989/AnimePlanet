@@ -97,6 +97,23 @@ export const actions = {
 
 		await createEpisodeByMal({ ...data, animeId: event.params.animeId });
 	},
+	exportToJson: async (event) => {
+		const animeId = event.params.animeId;
+		const exportedAnime = await db.query.anime.findFirst({
+			where: (anime, { eq }) => eq(anime.id, animeId),
+			with: {
+				episodes: {
+					with: {
+						downloads: true,
+						videos: true
+					}
+				},
+				tags: true
+			}
+		});
+
+		return { exportedAnime: { animePlanetVersion: '0.3.10', ...exportedAnime } };
+	},
 	// TODO: Automate sending notification
 	sendEpisode: async (event) => {
 		const formData = await event.request.formData();
