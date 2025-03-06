@@ -39,6 +39,10 @@ export const userToGroupRelations = relations(userToGroup, ({ one }) => ({
 export type UserToGroup = typeof userToGroup.$inferSelect;
 export type CreateUserToGroup = typeof userToGroup.$inferInsert;
 
+///////////////////
+// Tag <=> Anime //
+///////////////////
+
 export const tagToAnime = sqliteTable(
 	'tag_to_anime',
 	{

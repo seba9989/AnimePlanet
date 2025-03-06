@@ -4,12 +4,13 @@
 	import Textarea from '$components/atoms/Textarea/Textarea.svelte';
 	import Form from '$components/molecules/Form';
 	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
+	import { encodeUrl } from '$lib/utils/urlReadable';
 	import { Modal } from '@skeletonlabs/skeleton-svelte';
 	import { CircleX } from 'lucide-svelte';
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
 
-	let { data } = $props();
+	let { data, form } = $props();
 	let { anime: animeFull, tags } = $derived(data);
 
 	let { episodes, ...anime } = $derived(animeFull);
@@ -37,6 +38,20 @@
 	};
 
 	let openState = $state(false);
+
+	function downloadJSON() {
+		const jsonString = JSON.stringify(form?.exportedAnime, null, 2);
+
+		const blob = new Blob([jsonString], { type: 'application/json' });
+
+		const link = document.createElement('a');
+		link.href = URL.createObjectURL(blob);
+		link.download = encodeUrl(anime.title);
+
+		link.click();
+
+		URL.revokeObjectURL(link.href);
+	}
 </script>
 
 <div>
@@ -48,21 +63,31 @@
 				changeMode();
 			}
 		}}
+		onSuccess={(event) => {
+			if (event.action.search === '?/exportToJson') {
+				downloadJSON();
+			}
+		}}
 		types={{
 			tags: '[array]',
 			embeds: '[array]',
 			downloads: '[array]'
 		}}
 	>
-		<div class="flex justify-end gap-4">
-			<Form.Confirm class="btn preset-tonal" formaction="?/sendAnime" resetStyle>
-				Send Anime
+		<div class="flex justify-between gap-4">
+			<Form.Confirm class="btn preset-tonal" formaction="?/exportToJson" resetStyle>
+				Export do JSON
 			</Form.Confirm>
-			{#if saveMode}
-				<button onclick={changeMode} type="button" class="btn preset-filled">Edit</button>
-			{:else}
-				<Confirm class="btn preset-tonal-primary">Save</Confirm>
-			{/if}
+			<div>
+				<Form.Confirm class="btn preset-tonal" formaction="?/sendAnime" resetStyle>
+					Send Anime
+				</Form.Confirm>
+				{#if saveMode}
+					<button onclick={changeMode} type="button" class="btn preset-filled">Edit</button>
+				{:else}
+					<Confirm class="btn preset-tonal-primary">Save</Confirm>
+				{/if}
+			</div>
 		</div>
 		<div class="grid grid-cols-[auto_1fr_1fr_1fr] gap-4">
 			<Cover img={anime.coverImageUrl} class="min-w-60" />
