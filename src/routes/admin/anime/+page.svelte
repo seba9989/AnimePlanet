@@ -20,7 +20,7 @@
 	});
 
 	let addAnimeOS = $state(false);
-	let importAnimeOS = $state(true);
+	let importAnimeOS = $state(false);
 
 	function modalClose() {
 		importAnimeOS = false;
