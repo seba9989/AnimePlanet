@@ -1,4 +1,5 @@
-import { anime, download, video } from './index';
+import { episodeSource } from './episode_source';
+import { anime } from './index';
 import { id, uuid } from './utils';
 import { relations } from 'drizzle-orm';
 import { integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
@@ -15,8 +16,7 @@ export const episode = sqliteTable(
 );
 export const episodeRelations = relations(episode, ({ one, many }) => ({
 	anime: one(anime, { fields: [episode.animeId], references: [anime.id] }),
-	videos: many(video),
-	downloads: many(download)
+	episodeSources: many(episodeSource)
 }));
 
 export type Episode = typeof episode.$inferSelect;

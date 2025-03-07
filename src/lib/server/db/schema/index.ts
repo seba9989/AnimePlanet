@@ -12,6 +12,7 @@ export * from './session';
 export * from './tag';
 export * from './user';
 export * from './video';
+export * from './episode_source';
 
 export type Link = Prettify<Video & Download>;
 export type CreateLink = Prettify<CreateVideo & CreateDownload>;

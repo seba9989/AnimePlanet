@@ -1,15 +1,18 @@
-import { episode } from './index';
+import { episodeSource } from './index';
 import { id, uuid } from './utils';
 import { relations } from 'drizzle-orm';
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const download = sqliteTable('download', {
 	id: uuid().primaryKey(),
-	episodeId: id().notNull(),
+	episodeSourceId: id().notNull(),
 	url: text().unique().notNull()
 });
 export const downloadRelations = relations(download, ({ one }) => ({
-	episode: one(episode, { fields: [download.episodeId], references: [episode.id] })
+	episodeSource: one(episodeSource, {
+		fields: [download.episodeSourceId],
+		references: [episodeSource.id]
+	})
 }));
 
 export type Download = typeof download.$inferSelect;

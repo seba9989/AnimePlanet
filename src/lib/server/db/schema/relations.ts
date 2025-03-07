@@ -1,3 +1,4 @@
+import { episodeSource } from './episode_source';
 import { anime, group, role, tag, user } from './index';
 import { id } from './utils';
 import { relations } from 'drizzle-orm';
@@ -68,3 +69,31 @@ export const tagToAnimeRelations = relations(tagToAnime, ({ one }) => ({
 
 export type TagToAnime = typeof tagToAnime.$inferSelect;
 export type CreateTagToAnime = typeof tagToAnime.$inferInsert;
+
+//////////////////////////////
+// Episode Source <=> Group //
+//////////////////////////////
+
+export const episodeSourceToGroup = sqliteTable(
+	'episode_source_to_group',
+	{
+		episodeSourceId: id()
+			.notNull()
+			.references(() => episodeSource.id),
+		groupId: id()
+			.notNull()
+			.references(() => group.id)
+	},
+	(t) => [primaryKey({ columns: [t.episodeSourceId, t.groupId] })]
+);
+
+export const episodeSourceToGroupRelations = relations(episodeSourceToGroup, ({ one }) => ({
+	episodeSource: one(episodeSource, {
+		fields: [episodeSourceToGroup.episodeSourceId],
+		references: [episodeSource.id]
+	}),
+	group: one(group, {
+		fields: [episodeSourceToGroup.groupId],
+		references: [group.id]
+	})
+}));

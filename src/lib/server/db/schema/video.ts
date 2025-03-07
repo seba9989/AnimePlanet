@@ -1,15 +1,18 @@
-import { episode } from './index';
+import { episodeSource } from './index';
 import { id, uuid } from './utils';
 import { relations } from 'drizzle-orm';
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const video = sqliteTable('video', {
 	id: uuid().primaryKey(),
-	episodeId: id().notNull(),
+	episodeSourceId: id().notNull(),
 	url: text().unique().notNull()
 });
 export const videoRelations = relations(video, ({ one }) => ({
-	episode: one(episode, { fields: [video.episodeId], references: [episode.id] })
+	episodeSource: one(episodeSource, {
+		fields: [video.episodeSourceId],
+		references: [episodeSource.id]
+	})
 }));
 
 export type Video = typeof video.$inferSelect;
