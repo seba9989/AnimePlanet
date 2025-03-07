@@ -1,6 +1,6 @@
 # [AnimePlanet](https://animeplanet.org/)
 
-![AnimePlanet Logo](https://media.discordapp.net/attachments/1016199786313039882/1327663416596234240/LOGO_2330x650.png?ex=67ab6f69&is=67aa1de9&hm=58925beee288e36ef0e2f171d5ac0a667540f335c36738ec8948e3c5fdbeb427&=&format=webp&quality=lossless&width=1407&height=393)
+![AnimePlanet Logo](https://i.imgur.com/QWef9pk.png)
 **Otwarty projekt strony internetowej dla fanów anime, stworzony z wykorzystaniem SvelteKit, Tailwind CSS i nowoczesnych technologii backendowych.**
 
 ## 📌 Opis projektu
