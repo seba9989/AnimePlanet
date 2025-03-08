@@ -6,7 +6,7 @@ import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 export const group = sqliteTable('group', {
 	id: uuid().primaryKey(),
 	name: text().unique().notNull(),
-	type: text({ enum: ['INTERNAL', 'VOICEOVER', 'SUBTITLES'] })
+	type: text({ enum: ['INTERNAL', 'VOICEOVER', 'SUBTITLES'] }).notNull()
 });
 export const groupRelations = relations(group, ({ many }) => ({
 	users: many(userToGroup),
