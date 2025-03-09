@@ -7,7 +7,9 @@ import {
 	video,
 	type Anime,
 	type Episode,
-	type TagToAnime
+	type TagToAnime,
+	type Role,
+	role
 } from '../schema';
 import { and, eq } from 'drizzle-orm';
 
@@ -73,4 +75,8 @@ export const removeAnime = async ({ id }: RemoveAnime) => {
 	});
 
 	await db.delete(anime).where(eq(anime.id, id));
+};
+
+export const removeRole = async ({ name }: Role) => {
+	await db.delete(role).where(eq(role.name, name));
 };

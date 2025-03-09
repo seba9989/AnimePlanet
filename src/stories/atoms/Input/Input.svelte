@@ -1,16 +1,8 @@
 <script lang="ts">
-	import Password from './Password/Password.svelte';
+	import { cn } from '$lib/utils/cn';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	type Props = HTMLInputAttributes;
-
-	let props: Props = $props();
-
-	const { type } = props;
+	let { class: className, ...props }: HTMLInputAttributes = $props();
 </script>
 
-{#if type == 'password'}
-	<Password {...props} />
-{:else}
-	<input class="input" {...props} />
-{/if}
+<input class={cn(['input', className])} {...props} />

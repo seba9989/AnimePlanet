@@ -1,15 +1,21 @@
 import { jikanAnimeById, jikanEpisodes } from '$lib/apiHandlers/jikan';
+import { capitalizeFirstLetter } from '$lib/utils/capitalizeFirstLetter';
 import { db } from '..';
 import {
 	anime,
 	download,
 	episode,
+	group,
+	role,
 	tag,
 	tagToAnime,
+	userToGroup,
 	video,
 	type Anime,
 	type CreateAnime,
-	type CreateEpisode
+	type CreateEpisode,
+	type CreateGroup,
+	type CreateUserToGroup
 } from '../schema';
 import {
 	episodeDbPrototype,
@@ -99,4 +105,34 @@ export const createLinksToEpisode = async ({
 
 	if (videoPrototype.length > 0)
 		await db.insert(video).values(videoPrototype).onConflictDoNothing();
+};
+
+export const createGroup = async ({ name, type }: CreateGroup) => {
+	await db.insert(group).values({ name, type }).onConflictDoNothing();
+};
+
+type CreateRole = {
+	roles: string | string[];
+};
+
+export const createRole = async ({ roles }: CreateRole) => {
+	if (typeof roles === 'string') {
+		await db
+			.insert(role)
+			.values({ name: capitalizeFirstLetter(roles) })
+			.onConflictDoNothing();
+	} else {
+		await db
+			.insert(role)
+			.values(roles.map((v) => ({ name: capitalizeFirstLetter(v) })))
+			.onConflictDoNothing();
+	}
+};
+
+export const createUserToGroup = async (data: CreateUserToGroup | CreateUserToGroup[]) => {
+	if (Array.isArray(data)) {
+		await db.insert(userToGroup).values(data).onConflictDoNothing();
+	} else {
+		await db.insert(userToGroup).values(data).onConflictDoNothing();
+	}
 };

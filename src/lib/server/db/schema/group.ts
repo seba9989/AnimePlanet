@@ -13,5 +13,7 @@ export const groupRelations = relations(group, ({ many }) => ({
 	episodeSource: many(episodeSourceToGroup)
 }));
 
+console.log(group.type.enumValues);
+
 export type Group = typeof group.$inferSelect;
 export type CreateGroup = typeof group.$inferInsert;

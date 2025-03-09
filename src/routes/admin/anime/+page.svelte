@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Search from '$components/atoms/Input/Search/Search.svelte';
 	import Form from '$components/molecules/Form';
+	import Search from '$components/atoms/Input/Assets/Search.svelte';
 	import { animeListByTitle } from '$lib/apiHandlers/aniList';
 	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
 	import type { PageData } from './$types';
@@ -38,7 +38,7 @@
 
 <div class="flex items-center justify-between">
 	<Search
-		wrapperClass="w-full max-w-2xl"
+		class="w-full max-w-2xl"
 		placeholder="Szukany tytuł"
 		setQueryParam={{
 			name: 'title'

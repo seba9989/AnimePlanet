@@ -51,7 +51,7 @@ const registerType = type({
 export const actions: Actions = {
 	login: async (event) => {
 		const formData = await event.request.formData();
-		const { data, errors } = await validForm(formData, loginType);
+		const { data, errors } = validForm(formData, loginType);
 
 		if (errors) return error(400, errors);
 

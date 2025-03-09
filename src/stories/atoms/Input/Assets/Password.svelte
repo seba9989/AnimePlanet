@@ -3,13 +3,12 @@
 	import { Eye, EyeClosed } from 'lucide-svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLInputAttributes {
-		wrapperClass?: string;
-	}
+	type Props = HTMLInputAttributes & {
+		inputClass?: string;
+		buttonClass?: string;
+	};
 
-	let { type, ...props }: Props = $props();
-
-	const { wrapperClass, class: className } = props;
+	let { class: className, inputClass, buttonClass, type, ...props }: Props = $props();
 
 	const showPassword = () => {
 		if (type == 'password') {
@@ -20,11 +19,11 @@
 	};
 </script>
 
-<div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', wrapperClass)}>
-	<input {...props} {type} />
+<div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', className)}>
+	<input class={cn(inputClass)} {...props} {type} />
 	<button
 		type="button"
-		class={cn('input-group-cell preset-tonal-surface', className)}
+		class={cn('input-group-cell preset-tonal-surface', buttonClass)}
 		onclick={showPassword}
 	>
 		{#if type == 'password'}

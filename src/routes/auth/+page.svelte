@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Input from '$components/atoms/Input/Input.svelte';
 	import Form from '$components/molecules/Form/Form.svelte';
+	import Input from '$components/atoms/Input';
 </script>
 
 <div
@@ -11,7 +11,7 @@
 		<div class=" flex flex-col gap-4">
 			<Input type="text" name="login" placeholder="Login" />
 			<label class="label text-end">
-				<Input type="password" name="password" placeholder="Hasło" />
+				<Input.Password type="password" name="password" placeholder="Hasło" />
 				<span class="label-text"> <button class="anchor"> Nie pamiętam hasła. </button> </span>
 			</label>
 		</div>
@@ -30,8 +30,8 @@
 		<div class=" flex flex-col gap-4">
 			<Input type="text" name="login" placeholder="Login" />
 			<Input type="email" name="email" placeholder="Email" />
-			<Input type="password" name="password" placeholder="Hasło" />
-			<Input type="password" name="password" placeholder="Powtórz hasło" />
+			<Input.Password type="password" name="password" placeholder="Hasło" />
+			<Input.Password type="password" name="password" placeholder="Powtórz hasło" />
 		</div>
 
 		<button class="btn preset-filled-surface-50-950">Zarejestruj się</button>

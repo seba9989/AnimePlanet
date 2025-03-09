@@ -9,7 +9,7 @@ export const episodeSource = sqliteTable('episode_source', {
 });
 export const episodeSourceRelations = relations(episodeSource, ({ one, many }) => ({
 	episode: one(episode, { fields: [episodeSource.episodeId], references: [episode.id] }),
-    groups: many(episodeSourceToGroup),
+	groups: many(episodeSourceToGroup),
 	videos: many(video),
 	downloads: many(download)
 }));

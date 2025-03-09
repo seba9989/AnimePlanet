@@ -7,12 +7,20 @@
 	import type { HTMLButtonAttributes, HTMLInputAttributes } from 'svelte/elements';
 
 	type Props = HTMLInputAttributes & {
-		wrapperClass?: string;
+		inputClass?: string;
+		buttonClass?: string;
 		setQueryParam: Prettify<Omit<SetQueryParamConfig, 'value'>>;
 		onclick?: HTMLButtonAttributes['onclick'];
 	};
 
-	let { wrapperClass, onclick, setQueryParam: setQueryParamConfig, ...props }: Props = $props();
+	let {
+		class: className,
+		inputClass,
+		buttonClass,
+		onclick,
+		setQueryParam: setQueryParamConfig,
+		...props
+	}: Props = $props();
 	let value: string = $state('');
 
 	$effect(() => {
@@ -24,15 +32,20 @@
 	});
 </script>
 
-<div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', wrapperClass)}>
-	<input {...props} bind:value onkeyup={() => setQueryParam({ ...setQueryParamConfig, value })} />
+<div class={cn('input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800', className)}>
+	<input
+		class={cn(inputClass)}
+		{...props}
+		bind:value
+		onkeyup={() => setQueryParam({ ...setQueryParamConfig, value })}
+	/>
 
 	<button
+		class={cn('input-group-cell preset-tonal-surface', buttonClass)}
 		onclick={(event) => {
 			setQueryParam({ ...setQueryParamConfig, value });
 			onclick?.(event);
 		}}
-		class="input-group-cell preset-tonal-surface"
 	>
 		<Search size="20" />
 	</button>

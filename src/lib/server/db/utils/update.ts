@@ -5,10 +5,13 @@ import {
 	download,
 	episode,
 	tagToAnime,
+	userToGroup,
 	video,
 	type Anime,
 	type CreateLink,
-	type Episode
+	type CreateUserToGroup,
+	type Episode,
+	type UserToGroup
 } from '../schema';
 import { episodeDbPrototype, tagToAnimeDbPrototype } from './preFormating';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -69,4 +72,44 @@ type UpdateEpisode = Omit<Episode, 'animeId'>;
 
 export const updateEpisode = async ({ id, title, episodeNumber }: UpdateEpisode) => {
 	await db.update(episode).set({ title, episodeNumber }).where(eq(episode.id, id));
+};
+
+type UpdateUserToGroup = {
+	userId: UserToGroup['userId'];
+	groupId: UserToGroup['groupId'];
+	roles: string[];
+};
+export const updateUserToGroup = async ({ groupId, userId, roles }: UpdateUserToGroup) => {
+	const current = await db.query.userToGroup.findMany({
+		where: (userToGroup, { eq }) =>
+			and(eq(userToGroup.userId, userId), eq(userToGroup.groupId, groupId)),
+		columns: {
+			role: true
+		}
+	});
+
+	const currentRoles = new Set<string>(current.map(({ role }) => role));
+	const newRoles = new Set<string>(roles);
+
+	const rolesToRemove = currentRoles.difference(newRoles);
+	const rolesToAdd = newRoles.difference(currentRoles);
+
+	await db.transaction(async (tx) => {
+		await tx
+			.delete(userToGroup)
+			.where(
+				and(
+					eq(userToGroup.userId, userId),
+					eq(userToGroup.groupId, groupId),
+					inArray(userToGroup.role, [...rolesToRemove])
+				)
+			);
+
+		const userToGroupPrototype = [...rolesToAdd].map(
+			(v) => ({ groupId, userId, role: v }) satisfies CreateUserToGroup
+		);
+
+		if (userToGroupPrototype.length > 0)
+			await tx.insert(userToGroup).values(userToGroupPrototype).onConflictDoNothing();
+	});
 };

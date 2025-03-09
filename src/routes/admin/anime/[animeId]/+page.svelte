@@ -4,6 +4,7 @@
 	import Textarea from '$components/atoms/Textarea/Textarea.svelte';
 	import Form from '$components/molecules/Form';
 	import Confirm from '$components/molecules/Form/Assets/Confirm.svelte';
+	import Input from '$components/atoms/Input/index.js';
 	import { encodeUrl } from '$lib/utils/urlReadable';
 	import { Modal } from '@skeletonlabs/skeleton-svelte';
 	import { CircleX } from 'lucide-svelte';
@@ -11,7 +12,9 @@
 	import { fly } from 'svelte/transition';
 
 	let { data, form } = $props();
-	let { anime: animeFull, tags } = $derived(data);
+	let { anime: animeFull } = $derived(data);
+
+	let allTags = $derived.by(() => data.tags.map(({ name }) => name));
 
 	let { episodes, ...anime } = $derived(animeFull);
 
@@ -115,45 +118,7 @@
 				</div>
 				<div>
 					<h2 class="h4">Tags</h2>
-					<div class="flex flex-wrap gap-4">
-						{#each animeTags as tag (tag)}
-							<button
-								animate:flip={{ duration: 500 }}
-								in:fly={{ duration: 500, x: 50 }}
-								class="badge preset-filled"
-								onclick={() => removeTag(tag)}
-								disabled={saveMode}
-								type="button"
-							>
-								<CircleX size="16" />
-								<span>
-									{tag}
-								</span>
-								<input
-									type="checkbox"
-									defaultChecked
-									defaultValue={tag}
-									name="tags"
-									class="hidden"
-								/>
-							</button>
-						{/each}
-					</div>
-					<div class="input-group grid-cols-[1fr_auto] divide-x divide-surface-200-800">
-						<select class="select" bind:value={newTag} disabled={saveMode}>
-							{#each tags as { name }}
-								<option value={name}>{name}</option>
-							{/each}
-						</select>
-						<button
-							class="input-group-cell preset-tonal-surface"
-							disabled={saveMode}
-							onclick={addTag}
-							type="button"
-						>
-							Add
-						</button>
-					</div>
+					<Input.Tag disabled={saveMode} tags={animeTags} {allTags} />
 				</div>
 			</div>
 

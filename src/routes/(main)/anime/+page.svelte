@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Search from '$components/atoms/Input/Search/Search.svelte';
+	import Search from '$components/atoms/Input/Assets/Search.svelte';
 	import AnimeList from '$components/organisms/AnimeList/AnimeList.svelte';
 	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
 	import type { Anime } from '$lib/server/db/schema';
