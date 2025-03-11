@@ -2,12 +2,14 @@
 	import { page } from '$app/state';
 	import { urlToHosting } from '$lib/utils/urlToHosting';
 	import type { PageData } from './$types';
+	import { Modal } from '@skeletonlabs/skeleton-svelte';
 
 	let { data }: { data: PageData } = $props();
 
 	const { episodeNumber, title } = $derived(data.episode);
 
 	let videoUrl = $state(data.episode.videos[0]?.url ?? '');
+	let downloadUrl = $state(data.episode.downloads[0]?.url ?? '');
 
 	$effect(() => {
 		if (data.episode.videos[0]?.url) videoUrl = data.episode.videos[0]?.url ?? '';
@@ -19,6 +21,13 @@
 		{ url: './#Episodes', text: 'Lista', active: true },
 		{ url: (episodeNumber + 1).toString(), text: 'Następny', active: data.nextEpisode }
 	]);
+
+	let downloadOS = $state({
+		value: false,
+		close: () => {
+			downloadOS.value = !downloadOS.value;
+		}
+	});
 </script>
 
 <div class="flex h-full flex-col gap-4">
@@ -55,7 +64,7 @@
 				<h3 class="truncate px-2 py-3">{title}</h3>
 			</div>
 
-			<div class="h5 px-2">
+			<div class="h5 px-2 space-y-2">
 				<div class="flex items-center justify-between">
 					<h4 class="font-semibold">Serwis:</h4>
 
@@ -65,6 +74,35 @@
 							<option value={url}>{urlToHosting(url)}</option>
 						{/each}
 					</select>
+				</div>
+				<div class="flex items-center justify-between">
+					<h4 class="font-semibold">Download:</h4>
+					<Modal
+						bind:open={downloadOS.value}
+						triggerBase="btn preset-tonal"
+						contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-md  w-[90%] max-w-screen-md"
+						backdropClasses="backdrop-blur-sm"
+					>
+						{#snippet trigger()}
+							Download
+						{/snippet}
+						{#snippet content()}
+							<header class="flex justify-between">
+								<h2 class="h2">Download</h2>
+							</header>
+							<div class="space-y-4">
+								<select class="select font-normal" bind:value={downloadUrl}>
+									{#each data.episode.downloads as { url }}
+										<option value={url}>{urlToHosting(url)}</option>
+									{/each}
+								</select>
+								<div class="flex justify-end space-x-4">
+									<button onclick={downloadOS.close} class="btn preset-tonal"> Close </button>
+									<a class="btn preset-filled" href={downloadUrl} target="_blank"> Download </a>
+								</div>
+							</div>
+						{/snippet}
+					</Modal>
 				</div>
 			</div>
 			<div class="grid grid-flow-col justify-items-stretch gap-1">
