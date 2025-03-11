@@ -8,7 +8,9 @@ export const episode = sqliteTable(
 	'episode',
 	{
 		id: uuid().primaryKey(),
-		animeId: id().notNull(),
+		animeId: id()
+			.notNull()
+			.references(() => anime.id),
 		episodeNumber: integer().notNull(),
 		title: text().notNull()
 	},

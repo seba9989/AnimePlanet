@@ -5,7 +5,9 @@ import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const video = sqliteTable('video', {
 	id: uuid().primaryKey(),
-	episodeSourceId: id().notNull(),
+	episodeSourceId: id()
+		.notNull()
+		.references(() => episodeSource.id),
 	url: text().unique().notNull()
 });
 export const videoRelations = relations(video, ({ one }) => ({
