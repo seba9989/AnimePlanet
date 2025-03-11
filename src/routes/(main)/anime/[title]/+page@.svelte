@@ -28,7 +28,7 @@
 </script>
 
 {#snippet Title(visible = true)}
-	<h1 class="h1 {visible ? '' : 'invisible'} text-nowrap">{title}</h1>
+	<h1 class="h1 {visible ? '' : 'invisible'} truncate max-w-[65vw]">{title}</h1>
 {/snippet}
 
 {#snippet InLineList(items: string[])}
