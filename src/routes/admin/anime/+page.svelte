@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Form from '$components/molecules/Form';
 	import Search from '$components/atoms/Input/Assets/Search.svelte';
+	import Form from '$components/molecules/Form';
 	import { animeListByTitle } from '$lib/apiHandlers/aniList';
 	import { createAnimeIndex, searchAnimeIndex } from '$lib/search';
 	import type { PageData } from './$types';
@@ -112,44 +112,44 @@
 	</div>
 </div>
 
-{#if anime.length > 0}
-	<div class="table-wrap">
-		<table class="table caption-bottom">
-			<thead>
+<div class="table-wrap">
+	<table class="table caption-bottom">
+		<thead>
+			<tr>
+				<th>Open</th>
+				<th>Title</th>
+				<th class="!text-right">Actions</th>
+			</tr>
+		</thead>
+		<tbody class="hover:[&>tr]:backdrop-brightness-75">
+			{#each anime as anime}
 				<tr>
-					<th>Open</th>
-					<th>Title</th>
-					<th class="!text-right">Actions</th>
+					<th>
+						<a href="anime/{anime.id}" class="btn-icon preset-tonal"><ArrowUpRight /></a>
+					</th>
+					<th>{anime.title}</th>
+					<th class="flex justify-end">
+						<Form
+							action="?/removeAnime"
+							staticValues={{
+								id: anime.id
+							}}
+						>
+							<Form.Confirm class="preset-tonal-error">Remove</Form.Confirm>
+						</Form>
+					</th>
 				</tr>
-			</thead>
-			<tbody class="hover:[&>tr]:backdrop-brightness-75">
-				{#each anime as anime}
-					<tr>
-						<th>
-							<a href="anime/{anime.id}" class="btn-icon preset-tonal"><ArrowUpRight /></a>
-						</th>
-						<th>{anime.title}</th>
-						<th class="flex justify-end">
-							<Form
-								action="?/removeAnime"
-								staticValues={{
-									id: anime.id
-								}}
-							>
-								<Form.Confirm class="preset-tonal-error">Remove</Form.Confirm>
-							</Form>
-						</th>
-					</tr>
-				{/each}
-			</tbody>
-			<tfoot>
+			{:else}
 				<tr>
-					<td colspan="2">Total</td>
-					<td class="text-right">{anime.length} Anime</td>
+					<th colspan="3">Nie ma jeszcze żadnych anime.</th>
 				</tr>
-			</tfoot>
-		</table>
-	</div>
-{:else}
-	<h2 class="h1 m-auto">Nie ma jeszcze żadnych anime.</h2>
-{/if}
+			{/each}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="2">Total</td>
+				<td class="text-right">{anime.length} Anime</td>
+			</tr>
+		</tfoot>
+	</table>
+</div>

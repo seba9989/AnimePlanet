@@ -2,7 +2,7 @@
 	import Search from '$components/atoms/Input/Assets/Search.svelte';
 	import Form from '$components/molecules/Form';
 	import type { PageData } from './$types';
-	import { Modal, TagsInput } from '@skeletonlabs/skeleton-svelte';
+	import { Modal } from '@skeletonlabs/skeleton-svelte';
 	import { ArrowUpRight } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -15,13 +15,6 @@
 		}
 	});
 
-	let addRoleOS = $state({
-		value: false,
-		close: () => {
-			addRoleOS.value = !addRoleOS.value;
-		}
-	});
-	let rolesToAdd = $state(data.roles);
 </script>
 
 <div class="flex justify-between">

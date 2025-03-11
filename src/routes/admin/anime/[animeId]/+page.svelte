@@ -7,9 +7,6 @@
 	import Input from '$components/atoms/Input/index.js';
 	import { encodeUrl } from '$lib/utils/urlReadable';
 	import { Modal } from '@skeletonlabs/skeleton-svelte';
-	import { CircleX } from 'lucide-svelte';
-	import { flip } from 'svelte/animate';
-	import { fly } from 'svelte/transition';
 
 	let { data, form } = $props();
 	let { anime: animeFull } = $derived(data);
@@ -118,7 +115,7 @@
 				</div>
 				<div>
 					<h2 class="h4">Tags</h2>
-					<Input.Tag disabled={saveMode} tags={animeTags} {allTags} />
+					<Input.Tag name="tags" disabled={saveMode} tags={animeTags} {allTags} />
 				</div>
 			</div>
 
